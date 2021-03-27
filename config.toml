@@ -1,0 +1,34 @@
+baseURL = "http://blog.belgaied.name/"
+languageCode = "en-us"
+title = "Kubernetes Ravings"
+theme = "mediumish-gohugo-theme"
+copyright = "Mohamed Belgaied Hassine - All rights reserved"
+disqusShortname = "kubernetes-ravings"
+
+[params.author]
+  name = "Mohamed Belgaied Hassine"
+  thumbnail = "/images/profile.png"
+  description = "Creator of this blog."
+
+[params.index]
+  picture = "/images/profile.png"
+  title = "Mohamed Belgaied Hassine"
+  subtitle = "I'm a Consulting Engineer at Rancher, now part of SUSE"
+  mdtext = '''
+This site will compile some of my learnings in the Kubernetes space!
+'''
+  alertbar = false
+
+[params.social]
+  github = "belgaied2"
+  linkedin = "mohamed-belgaied-hassine-870a5a4"
+  #xing = "<username>"
+  #medium = "<username>"
+  twitter = "belgaied2"
+
+## Main Menu
+[[menu.main]]
+    name = "Blog"
+    weight = 100
+    identifier = "blog"
+    url = "/blog"
