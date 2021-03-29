@@ -3,6 +3,7 @@ title: "Discovering HCI Project Harvester"
 date: 2021-03-17T13:07:15+01:00
 image: "/harv_screenshots/Harvester_install1_Grub.png"
 draft: false
+comments: true
 ---
 
 
