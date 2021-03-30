@@ -4,6 +4,7 @@ title = "Kubernetes Ravings"
 theme = "mediumish-gohugo-theme"
 copyright = "Mohamed Belgaied Hassine - All rights reserved"
 disqusShortname = "kubernetes-ravings"
+googleAnalytics = "UA-2401111704"
 
 [params.author]
   name = "Mohamed Belgaied Hassine"
