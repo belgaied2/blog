@@ -12,7 +12,6 @@ keywords:
   - Rancher
   - Virtualization
   - Open-Source
-path: /blog/harvester
 categories:
   - Harvester
 ---
