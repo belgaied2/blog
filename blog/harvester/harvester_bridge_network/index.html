@@ -1,22 +1,158 @@
-<!doctype html><html lang=en-us><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=generator content="Hugo 0.82.0"><title>Harvester VM with Bridged Network | Kubernetes Ravings</title><meta name=twitter:card content="summary"><meta name=twitter:title content="Harvester VM with Bridged Network"><meta name=twitter:description content="In the first article of this blog, I focused on installing Harvester and creating my first VM. In this article, I will describe how to create a VM that I can connect to directly through SSH. Indeed, the default networking mode used by Harvester is the masquerade mode, where the VMs get a cluster IP address, but cannot be accessed directly from outside the Harvester Cluster. In order to access the VMs from outside the cluster, you would need to create a NodePort service or a LoadBalancer service on the Kubernetes cluster underlying Harvester."><meta property="og:title" content="Harvester VM with Bridged Network"><meta property="og:description" content="In the first article of this blog, I focused on installing Harvester and creating my first VM. In this article, I will describe how to create a VM that I can connect to directly through SSH. Indeed, the default networking mode used by Harvester is the masquerade mode, where the VMs get a cluster IP address, but cannot be accessed directly from outside the Harvester Cluster. In order to access the VMs from outside the cluster, you would need to create a NodePort service or a LoadBalancer service on the Kubernetes cluster underlying Harvester."><meta property="og:type" content="article"><meta property="og:url" content="http://www.belgai.de/blog/harvester/harvester_bridge_network/"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-03-29T20:48:37+00:00"><meta property="article:modified_time" content="2021-03-29T20:48:37+00:00"><link href=https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css rel=stylesheet integrity=sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T crossorigin=anonymous><link rel=stylesheet href=https://use.fontawesome.com/releases/v5.0.13/css/all.css integrity=sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp crossorigin=anonymous><link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel=stylesheet><link href=/css/medium.css rel=stylesheet><link href=/css/additional.css rel=stylesheet></head><body><nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top mediumnavigation nav-down"><div class="container pr-0"><a class=navbar-brand href=http://www.belgai.de//><span style=font-family:Merriweather>Kubernetes Ravings</span></a>
+<!doctype html><html lang=en-us><head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=generator content="Hugo 0.92.0">
+<title>Harvester VM with Bridged Network | Kubernetes Ravings</title>
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Harvester VM with Bridged Network">
+<meta name=twitter:description content="In the first article of this blog, I focused on installing Harvester and creating my first VM. In this article, I will describe how to create a VM that I can connect to directly through SSH. Indeed, the default networking mode used by Harvester is the masquerade mode, where the VMs get a cluster IP address, but cannot be accessed directly from outside the Harvester Cluster. In order to access the VMs from outside the cluster, you would need to create a NodePort service or a LoadBalancer service on the Kubernetes cluster underlying Harvester.">
+<meta property="og:title" content="Harvester VM with Bridged Network">
+<meta property="og:description" content="In the first article of this blog, I focused on installing Harvester and creating my first VM. In this article, I will describe how to create a VM that I can connect to directly through SSH. Indeed, the default networking mode used by Harvester is the masquerade mode, where the VMs get a cluster IP address, but cannot be accessed directly from outside the Harvester Cluster. In order to access the VMs from outside the cluster, you would need to create a NodePort service or a LoadBalancer service on the Kubernetes cluster underlying Harvester.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://www.belgai.de/blog/harvester/harvester_bridge_network/"><meta property="article:section" content="blog">
+<meta property="article:published_time" content="2021-03-29T20:48:37+00:00">
+<meta property="article:modified_time" content="2021-03-29T20:48:37+00:00">
+<link href=https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css rel=stylesheet integrity=sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T crossorigin=anonymous>
+<link rel=stylesheet href=https://use.fontawesome.com/releases/v5.0.13/css/all.css integrity=sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp crossorigin=anonymous>
+<link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel=stylesheet>
+<link href=/css/medium.css rel=stylesheet>
+<link href=/css/additional.css rel=stylesheet>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top mediumnavigation nav-down">
+<div class="container pr-0">
+<a class=navbar-brand href=http://www.belgai.de//>
+<span style=font-family:Merriweather>Kubernetes Ravings</span>
+</a>
 <button class=navbar-toggler type=button data-toggle=collapse data-target=#navbarMediumish aria-controls=navbarSupportedContent aria-expanded=false aria-label="Toggle navigation">
-<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse" id=navbarMediumish><ul class="navbar-nav ml-auto"><li class=nav-item><a class=nav-link href=/blog>Blog</a></li></ul></div></div></nav><div class=site-content><div class=container><div class=mainheading><h1 class=sitetitle>Kubernetes Ravings</h1><p class=lead></p></div><div class=main-content><div class=container><div class=row><div class="col-md-2 pl-0"><div class="share sticky-top sticky-top-offset"><p>Share</p><ul><li class="ml-1 mr-1"><a target=_blank href="https://twitter.com/intent/tweet?text=Harvester%20VM%20with%20Bridged%20Network&url=http%3a%2f%2fwww.belgai.de%2fblog%2fharvester%2fharvester_bridge_network%2f" onclick="return window.open(this.href,'twitter-share','width=550,height=435'),!1"><i class="fab fa-twitter"></i></a></li><li class="ml-1 mr-1"><a target=_blank href="https://facebook.com/sharer.php?u=http%3a%2f%2fwww.belgai.de%2fblog%2fharvester%2fharvester_bridge_network%2f" onclick="return window.open(this.href,'facebook-share','width=550,height=435'),!1"><i class="fab fa-facebook-f"></i></a></li><li class="ml-1 mr-1"><a target=_blank href="https://www.xing.com/spi/shares/new?url=http%3a%2f%2fwww.belgai.de%2fblog%2fharvester%2fharvester_bridge_network%2f" onclick="return window.open(this.href,'xing-share','width=550,height=435'),!1"><i class="fab fa-xing"></i></a></li></ul><div class=sep></div><ul><li><a class="small smoothscroll" href=#disqus_thread></a></li></ul></div></div><div class="col-md-9 flex-first flex-md-unordered"><div class=mainheading><div class="row post-top-meta"><div class="col-xs-12 col-md-3 col-lg-2 text-center text-md-left mb-4 mb-md-0 md-nopad-right"><img class=author-thumb src=/images/profile.png alt="Mohamed Belgaied Hassine"></div><div class="col-xs-12 col-md-9 col-lg-10 text-center text-md-left md-nopad-left"><a target=_blank class=link-dark>Mohamed Belgaied Hassine</a><br><span class=author-description>Creator of this blog.<br><i class="far fa-star"></i>
+<span class=navbar-toggler-icon></span>
+</button>
+<div class="collapse navbar-collapse" id=navbarMediumish>
+<ul class="navbar-nav ml-auto">
+<li class=nav-item>
+<a class=nav-link href=/blog>Blog</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<div class=site-content>
+<div class=container>
+<div class=mainheading>
+<h1 class=sitetitle>Kubernetes Ravings</h1>
+<p class=lead>
+</p>
+</div><div class=main-content>
+<div class=container>
+<div class=row>
+<div class="col-md-2 pl-0"><div class="share sticky-top sticky-top-offset">
+<p>Share</p>
+<ul>
+<li class="ml-1 mr-1">
+<a target=_blank href="https://twitter.com/intent/tweet?text=Harvester%20VM%20with%20Bridged%20Network&url=http%3a%2f%2fwww.belgai.de%2fblog%2fharvester%2fharvester_bridge_network%2f" onclick="return window.open(this.href,'twitter-share','width=550,height=435'),!1">
+<i class="fab fa-twitter"></i>
+</a>
+</li>
+<li class="ml-1 mr-1">
+<a target=_blank href="https://facebook.com/sharer.php?u=http%3a%2f%2fwww.belgai.de%2fblog%2fharvester%2fharvester_bridge_network%2f" onclick="return window.open(this.href,'facebook-share','width=550,height=435'),!1">
+<i class="fab fa-facebook-f"></i>
+</a>
+</li>
+<li class="ml-1 mr-1">
+<a target=_blank href="https://www.xing.com/spi/shares/new?url=http%3a%2f%2fwww.belgai.de%2fblog%2fharvester%2fharvester_bridge_network%2f" onclick="return window.open(this.href,'xing-share','width=550,height=435'),!1">
+<i class="fab fa-xing"></i>
+</a>
+</li>
+</ul>
+<div class=sep>
+</div>
+<ul>
+<li>
+<a class="small smoothscroll" href=#disqus_thread></a>
+</li>
+</ul>
+</div>
+</div>
+<div class="col-md-9 flex-first flex-md-unordered">
+<div class=mainheading>
+<div class="row post-top-meta">
+<div class="col-xs-12 col-md-3 col-lg-2 text-center text-md-left mb-4 mb-md-0 md-nopad-right">
+<img class=author-thumb src=/images/profile.png alt="Mohamed Belgaied Hassine">
+</div>
+<div class="col-xs-12 col-md-9 col-lg-10 text-center text-md-left md-nopad-left">
+<a target=_blank class=link-dark>Mohamed Belgaied Hassine</a><br>
+<span class=author-description>
+Creator of this blog.<br>
+<i class="far fa-star"></i>
 Mar 29, 2021
 <i class="far fa-clock clock"></i>
-6 min read</span></div></div><h1 class=posttitle>Harvester VM with Bridged Network</h1></div><div class=article-post><p>In the first article of this blog, I focused on installing Harvester and creating my first VM. In this article, I will describe how to create a VM that I can connect to directly through SSH. Indeed, the default networking mode used by Harvester is the <em>masquerade</em> mode, where the VMs get a cluster IP address, but cannot be accessed directly from outside the Harvester Cluster. In order to access the VMs from outside the cluster, you would need to create a <a href=https://kubernetes.io/docs/concepts/services-networking/service/#nodeport>NodePort</a> service or a <a href=https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer>LoadBalancer</a> service on the Kubernetes cluster underlying Harvester.</p><h2 id=setting-up-the-network-interface-for-the-bridged-network>Setting up the network interface for the bridged network</h2><p>I need first to set up the Host&rsquo;s interface on which bridged networking should happen. I can do that by going to the <em>advanced/settings</em> where I will find the <em>network-setting</em>:</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_01_settings.png alt="Network Settings before"></p><p>Now, by clicking on <strong>⋮ > Edit as a From</strong> in front of <em>network-setting</em>, I can define the network interface that will be used on the Host to bridge the VMs Networking.</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_02_settings_before.png alt="Network Settings Edit"></p><p>In my case, I will be using the <em>eth4</em> interface:</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_03_settings_network_eth4.png alt="Network Settings new interface"></p><p>After saving, the following screen shows the new <em>network-setting</em> value:</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_04_settings_after.png alt="Network Settings after"></p><p>Now is time to setup the vlan for that bridge network.</p><h2 id=settings-up-the-vlan-network>Settings up the vlan network</h2><p>On the menu on the left side, I click on <em>networks</em> to see the following screen where I will create a new network by clicking on the <em>Create</em> button on the upper-right side.</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_05_networks_before.png alt="Network Settings after"></p><p>In the next screen, I give my network a name and a vlan number, in my case <code>91</code> , then click on <em>Save</em>:</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_06_networks_set_vlan.png alt="Network Settings set vlan"></p><p>Finally, I check the result :</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_07_networks_after.png alt="Network Settings after"></p><p>Now, we are ready to create a VM with bridged networking</p><h2 id=setting-up-the-vm-for-bridged-networking>Setting up the VM for bridged networking</h2><p>In order to create a VM with bridged networking, I will do the same process as the one used in the <a href=/blog/harvester/harvester_discover>Discovering Harvester</a> article with some slight changes.</p><p>First, I navigate to the <em>Virtual Machines</em> menu item, and then I click on the <em>Create</em> button.</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_08_vms_before.png alt="VM before"></p><p>Then, I fill up the basic information for the VM, such as CPU number, Memory Size, Base image and SSH public key as follows:</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_09_vms_basics.png alt="VM basics"></p><p>After that, I click on the <em>Networks</em> sub-menu and click on the <em>Add Network</em> button to find something similar to the following screen:</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_10_vms_networks.png alt="VM networks"></p><p>Finally, I click on the <em>Advanced Options</em> sub-menu to do small changes to the <code>User Data</code> and <code>Network Data</code> configurations.</p><p>This should be added in the <code>User Data</code> field:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#75715e>#cloud-config</span>
+6 min read
+</span>
+</div>
+</div>
+<h1 class=posttitle>Harvester VM with Bridged Network</h1>
+</div>
+<div class=article-post>
+<p>In the first article of this blog, I focused on installing Harvester and creating my first VM. In this article, I will describe how to create a VM that I can connect to directly through SSH. Indeed, the default networking mode used by Harvester is the <em>masquerade</em> mode, where the VMs get a cluster IP address, but cannot be accessed directly from outside the Harvester Cluster. In order to access the VMs from outside the cluster, you would need to create a <a href=https://kubernetes.io/docs/concepts/services-networking/service/#nodeport>NodePort</a> service or a <a href=https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer>LoadBalancer</a> service on the Kubernetes cluster underlying Harvester.</p>
+<h2 id=setting-up-the-network-interface-for-the-bridged-network>Setting up the network interface for the bridged network</h2>
+<p>I need first to set up the Host&rsquo;s interface on which bridged networking should happen. I can do that by going to the <em>advanced/settings</em> where I will find the <em>network-setting</em>:</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_01_settings.png alt="Network Settings before"></p>
+<p>Now, by clicking on <strong>⋮ > Edit as a From</strong> in front of <em>network-setting</em>, I can define the network interface that will be used on the Host to bridge the VMs Networking.</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_02_settings_before.png alt="Network Settings Edit"></p>
+<p>In my case, I will be using the <em>eth4</em> interface:</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_03_settings_network_eth4.png alt="Network Settings new interface"></p>
+<p>After saving, the following screen shows the new <em>network-setting</em> value:</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_04_settings_after.png alt="Network Settings after"></p>
+<p>Now is time to setup the vlan for that bridge network.</p>
+<h2 id=settings-up-the-vlan-network>Settings up the vlan network</h2>
+<p>On the menu on the left side, I click on <em>networks</em> to see the following screen where I will create a new network by clicking on the <em>Create</em> button on the upper-right side.</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_05_networks_before.png alt="Network Settings after"></p>
+<p>In the next screen, I give my network a name and a vlan number, in my case <code>91</code> , then click on <em>Save</em>:</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_06_networks_set_vlan.png alt="Network Settings set vlan"></p>
+<p>Finally, I check the result :</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_07_networks_after.png alt="Network Settings after"></p>
+<p>Now, we are ready to create a VM with bridged networking</p>
+<h2 id=setting-up-the-vm-for-bridged-networking>Setting up the VM for bridged networking</h2>
+<p>In order to create a VM with bridged networking, I will do the same process as the one used in the <a href=/blog/harvester/harvester_discover>Discovering Harvester</a> article with some slight changes.</p>
+<p>First, I navigate to the <em>Virtual Machines</em> menu item, and then I click on the <em>Create</em> button.</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_08_vms_before.png alt="VM before"></p>
+<p>Then, I fill up the basic information for the VM, such as CPU number, Memory Size, Base image and SSH public key as follows:</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_09_vms_basics.png alt="VM basics"></p>
+<p>After that, I click on the <em>Networks</em> sub-menu and click on the <em>Add Network</em> button to find something similar to the following screen:</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_10_vms_networks.png alt="VM networks"></p>
+<p>Finally, I click on the <em>Advanced Options</em> sub-menu to do small changes to the <code>User Data</code> and <code>Network Data</code> configurations.</p>
+<p>This should be added in the <code>User Data</code> field:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#75715e>#cloud-config</span>
 <span style=color:#f92672>password</span>: <span style=color:#ae81ff>password</span>
 <span style=color:#f92672>chpasswd</span>: { <span style=color:#f92672>expire</span>: <span style=color:#66d9ef>False</span>}
 <span style=color:#f92672>ssh_pwauth</span>: <span style=color:#66d9ef>True</span>
 <span style=color:#f92672>packages</span>:
   - <span style=color:#ae81ff>qemu-guest-agent</span>
-</code></pre></div><p>Now, this is not necessary but helps a lot in case something related to networking goes wrong. Keep in mind that in productive environment you might want to remove some of these for security reasons:</p><ul><li>the <code>password</code> field makes it possible to set a password for the default linux user on the VM, which in my case will be the user <code>ubuntu</code>.</li><li>the <code>ssh_pwauth</code> field set to true activates password authentication in SSH, which might help if your private did not work.</li><li>the <code>chpasswd</code> field with the <code>expire: False</code> directive avoids that the password would ever expire</li><li>the <code>packages</code> field configures cloud-init to install packages. In our case, the package <code>qemu-guest-agent</code> will make it possible to update some fields in Kubernetes (underlying Harvester) showing the IP Address of the VM that was defined using DHCP inside the VM.</li></ul><p>And this should be added in the <code>Network Data</code> field:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>version</span>: <span style=color:#ae81ff>2</span>
+</code></pre></div><p>Now, this is not necessary but helps a lot in case something related to networking goes wrong. Keep in mind that in productive environment you might want to remove some of these for security reasons:</p>
+<ul>
+<li>the <code>password</code> field makes it possible to set a password for the default linux user on the VM, which in my case will be the user <code>ubuntu</code>.</li>
+<li>the <code>ssh_pwauth</code> field set to true activates password authentication in SSH, which might help if your private did not work.</li>
+<li>the <code>chpasswd</code> field with the <code>expire: False</code> directive avoids that the password would ever expire</li>
+<li>the <code>packages</code> field configures cloud-init to install packages. In our case, the package <code>qemu-guest-agent</code> will make it possible to update some fields in Kubernetes (underlying Harvester) showing the IP Address of the VM that was defined using DHCP inside the VM.</li>
+</ul>
+<p>And this should be added in the <code>Network Data</code> field:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>version</span>: <span style=color:#ae81ff>2</span>
 <span style=color:#f92672>renderer</span>: <span style=color:#ae81ff>networkd</span>
 <span style=color:#f92672>ethernets</span>:
   <span style=color:#f92672>enp1s0</span>:
     <span style=color:#f92672>dhcp4</span>: <span style=color:#66d9ef>true</span>
   <span style=color:#f92672>enp2s0</span>:
     <span style=color:#f92672>dhcp4</span>: <span style=color:#66d9ef>true</span>
-</code></pre></div><p>This configuration is a <a href=https://cloudinit.readthedocs.io/en/latest/topics/network-config.html>Netplan</a> configuration to activate DHCP for both Network interfaces on the VM.</p><p>The final result should look similar to the following:</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_11_vms_advanced_configs.png alt="VM advanced"></p><p>Now, I just click on <em>Create</em> to finalize the VM creation. After a couple of minutes, the VM should be shown as <code>Running</code>.</p><h2 id=connecting-to-the-vm>Connecting to the VM</h2><p>As soon as the VM is in the <code>Running</code> state, it is naturally possible to use the <em>Serial Console</em> as it was done in the <a href=/blog/harvester/harvester_discover>Discovering Harvester</a> article. In this article however, we will try another way.</p><p>This VM is using a bridged network connection, meaning that it is available on an IP address that should be easily available from outside the Harvester cluster on the VLAN that we defined previously. This IP address is however assigned per DHCP to the VM. In order to get that IP address, it is possible to use the <em>Serial Console</em> first and run the command <code>ip addr show</code> inside the VM, but there is a more elegant solution which will probably be integrated to the Harvester UI in the future. That is through Harvester&rsquo;s API for VirtualMachineInstances at this address : <code>https://&lt;HARVESTER_URL:HARVESTER_PORT>/v1/kubevirt.io.virtualmachineinstances</code>. Under the <code>interfaces</code> section of the corresponding VM element, it is possible to find the bridged IP address as shown in the following screenshot:</p><p><img src=/hv_bridge_networking_images/hv_bridge_networking_12_api_ip_address.png alt="VM IP Address"></p><p>Now, a simple SSH connection to that IP address using the VM Linux user and the corresponding private key should get you a prompt:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>harvester-7m6kh <span style=color:#f92672>[</span>~<span style=color:#f92672>]</span>$ ssh ubuntu@172.16.91.23
+</code></pre></div><p>This configuration is a <a href=https://cloudinit.readthedocs.io/en/latest/topics/network-config.html>Netplan</a> configuration to activate DHCP for both Network interfaces on the VM.</p>
+<p>The final result should look similar to the following:</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_11_vms_advanced_configs.png alt="VM advanced"></p>
+<p>Now, I just click on <em>Create</em> to finalize the VM creation. After a couple of minutes, the VM should be shown as <code>Running</code>.</p>
+<h2 id=connecting-to-the-vm>Connecting to the VM</h2>
+<p>As soon as the VM is in the <code>Running</code> state, it is naturally possible to use the <em>Serial Console</em> as it was done in the <a href=/blog/harvester/harvester_discover>Discovering Harvester</a> article. In this article however, we will try another way.</p>
+<p>This VM is using a bridged network connection, meaning that it is available on an IP address that should be easily available from outside the Harvester cluster on the VLAN that we defined previously. This IP address is however assigned per DHCP to the VM. In order to get that IP address, it is possible to use the <em>Serial Console</em> first and run the command <code>ip addr show</code> inside the VM, but there is a more elegant solution which will probably be integrated to the Harvester UI in the future. That is through Harvester&rsquo;s API for VirtualMachineInstances at this address : <code>https://&lt;HARVESTER_URL:HARVESTER_PORT>/v1/kubevirt.io.virtualmachineinstances</code>. Under the <code>interfaces</code> section of the corresponding VM element, it is possible to find the bridged IP address as shown in the following screenshot:</p>
+<p><img src=/hv_bridge_networking_images/hv_bridge_networking_12_api_ip_address.png alt="VM IP Address"></p>
+<p>Now, a simple SSH connection to that IP address using the VM Linux user and the corresponding private key should get you a prompt:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>harvester-7m6kh <span style=color:#f92672>[</span>~<span style=color:#f92672>]</span>$ ssh ubuntu@172.16.91.23
 load pubkey <span style=color:#e6db74>&#34;/home/rancher/.ssh/id_rsa&#34;</span>: invalid format
 The authenticity of host <span style=color:#e6db74>&#39;172.16.91.23 (172.16.91.23)&#39;</span> can<span style=color:#ae81ff>\&#39;</span>t be established.
 ECDSA key fingerprint is SHA256:PFBj8bqpUmnkX5gwVNFgWh4dLWGyhWWbEMXGwMPTKrs.
@@ -48,5 +184,67 @@ To run a command as administrator <span style=color:#f92672>(</span>user <span s
 See <span style=color:#e6db74>&#34;man sudo_root&#34;</span> <span style=color:#66d9ef>for</span> details.
 
 ubuntu@ubuntu-1:~$
-</code></pre></div><h1 id=conclusion>Conclusion</h1><p>In this article, using Harvester, we defined a Host Network Interface to be used for VM Network bridging, then we associated a VLAN and made a new VM join that VLAN and use DHCP to get an IP Address. Then, we used Harvester&rsquo;s API to get the IP address of the VM on the bridge network and connected successfully to the VM using SSH. This process will be greatly improved and simplified in the future. But, at least until then, you can also do it relatively easily using this method.</p><p>Does this method also work for you? Did you have issues? Please let me know in the comments below and I will be more than happy to engage with you.</p></div><div class=after-post-tags><ul class=tags><li><a href=/tags/harvester>Harvester</a></li><li><a href=/tags/virtualization>Virtualization</a></li></ul></div><div class="row PageNavigation d-flex justify-content-between font-weight-bold"><a class="d-block col-md-6 text-lg-right" href=http://www.belgai.de/blog/harvester/harvester_discover/>Discovering HCI Project Harvester &#187;</a><div class=clearfix></div></div></div></div></div><div class=container><div id=comments class="row justify-content-center mb-5"><div class=col-md-8><div id=disqus_thread></div><script type=application/javascript>var disqus_config=function(){};(function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById('disqus_thread').innerHTML='Disqus comments not available by default when the website is previewed locally.';return}var b=document,a=b.createElement('script');a.async=!0,a.src='//kubernetes-ravings.disqus.com/embed.js',a.setAttribute('data-timestamp',+new Date),(b.head||b.body).appendChild(a)})()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a></div></div></div></div></div><div class="jumbotron fortags"><div class="d-md-flex h-100"><div class="col-md-4 transpdark align-self-center text-center h-100"><div class="d-md-flex align-items-center justify-content-center h-100"><h2 class="d-md-block d-none align-self-center py-1 font-weight-light">Explore <span class="d-none d-md-inline">→</span></h2></div></div><div class="col-md-8 p-5 align-self-center text-center"><a class="mt-1 mb-1" href=/tags/harvester>harvester</a>
-<a class="mt-1 mb-1" href=/tags/virtualization>virtualization</a></div></div></div><footer class=footer><div class=container><div class=row><div class="col-md-6 col-sm-6 text-center text-lg-left">&copy; Copyright Mohamed Belgaied Hassine - All rights reserved</div><div class="col-md-6 col-sm-6 text-center text-lg-right"><a target=_blank rel=noopener href=https://www.wowthemes.net>Mediumish Theme</a> by WowThemes.net</div></div></div></footer></div><script src=https://code.jquery.com/jquery-3.4.1.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js integrity=sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut crossorigin=anonymous></script><script src=https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js integrity=sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM crossorigin=anonymous></script><script src=/js/mediumish.js></script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-2401111704','auto'),ga('send','pageview'))</script></body></html>
+</code></pre></div><h1 id=conclusion>Conclusion</h1>
+<p>In this article, using Harvester, we defined a Host Network Interface to be used for VM Network bridging, then we associated a VLAN and made a new VM join that VLAN and use DHCP to get an IP Address. Then, we used Harvester&rsquo;s API to get the IP address of the VM on the bridge network and connected successfully to the VM using SSH. This process will be greatly improved and simplified in the future. But, at least until then, you can also do it relatively easily using this method.</p>
+<p>Does this method also work for you? Did you have issues? Please let me know in the comments below and I will be more than happy to engage with you.</p>
+</div>
+<div class=after-post-tags>
+<ul class=tags>
+<li>
+<a href=/tags/harvester>Harvester</a>
+</li>
+<li>
+<a href=/tags/virtualization>Virtualization</a>
+</li>
+</ul>
+</div>
+<div class="row PageNavigation d-flex justify-content-between font-weight-bold">
+<a class="d-block col-md-6 text-lg-right" href=http://www.belgai.de/blog/harvester/harvester_discover/>Discovering HCI Project Harvester &#187;</a>
+<div class=clearfix></div>
+</div>
+</div>
+</div>
+</div>
+<div class=container>
+<div id=comments class="row justify-content-center mb-5">
+<div class=col-md-8>
+<script defer src=http://commento.belgai.de:8080/js/commento.js></script>
+<div id=commento></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jumbotron fortags">
+<div class="d-md-flex h-100">
+<div class="col-md-4 transpdark align-self-center text-center h-100">
+<div class="d-md-flex align-items-center justify-content-center h-100">
+<h2 class="d-md-block d-none align-self-center py-1 font-weight-light">Explore <span class="d-none d-md-inline">→</span></h2>
+</div>
+</div>
+<div class="col-md-8 p-5 align-self-center text-center">
+<a class="mt-1 mb-1" href=/tags/harvester>harvester</a>
+<a class="mt-1 mb-1" href=/tags/virtualization>virtualization</a>
+</div>
+</div>
+</div>
+<footer class=footer>
+<div class=container>
+<div class=row>
+<div class="col-md-6 col-sm-6 text-center text-lg-left">
+&copy; Copyright Mohamed Belgaied Hassine - All rights reserved
+</div>
+<div class="col-md-6 col-sm-6 text-center text-lg-right">
+<a target=_blank rel=noopener href=https://www.wowthemes.net>Mediumish Theme</a> by WowThemes.net
+</div>
+</div>
+</div>
+</footer>
+</div>
+<script src=https://code.jquery.com/jquery-3.4.1.min.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js integrity=sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut crossorigin=anonymous></script>
+<script src=https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js integrity=sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM crossorigin=anonymous></script>
+<script src=/js/mediumish.js></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-2401111704','auto'),ga('send','pageview'))</script>
+</body>
+</html>
