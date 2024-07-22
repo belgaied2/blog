@@ -18,7 +18,15 @@
 	<link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel="stylesheet">
 	<link href="{{ "/css/medium.css" | urlize | relURL }}" rel="stylesheet">
 	<link href="{{ "/css/additional.css" | urlize | relURL }}" rel="stylesheet">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NEZQ0R96ZR"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
+    gtag('config', 'G-NEZQ0R96ZR');
+  </script>
 	<!-- Custom css -->
 	{{ range .Site.Params.customCSS -}}
 	{{ $style := resources.Get . }}
