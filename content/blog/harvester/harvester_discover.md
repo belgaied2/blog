@@ -14,8 +14,6 @@ keywords:
     - Open-Source
 ---
 
-
-# Introduction to Harvester
 Harvester is an OSS (Open Source Software) project created by Rancher Labs (now part of SUSE) that provides a Kubernetes-based HCI (Hyper-Converged Infrastructure) solution. Its main goal is to combine many existing OSS projects to offer an easy-to-use platform for software defined infrastructure. This includes :
 
 - Compute Virtualization using [KubeVirt](https://kubevirt.io/)
