@@ -6,8 +6,8 @@ on:
       - master  # Set a branch to deploy
 
 jobs:
-  runs-on: ubuntu-latest
   deploy:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
