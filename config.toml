@@ -1,4 +1,4 @@
-baseURL = "https://www.belgai.de/"
+baseURL = "http://www.belgai.de/"
 languageCode = "en-us"
 title = "Kubernetes Ravings"
 theme = "mediumish-gohugo-theme"
