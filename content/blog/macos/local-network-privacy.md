@@ -1,7 +1,7 @@
 ---
 title: "macOS Local Network Privacy: why your CLI gets EHOSTUNREACH and how to fix it"
 date: 2026-10-22T09:00:00+02:00
-draft: true
+draft: false
 author: Mohamed Belgaied Hassine
 comments: true
 description: "curl reaches the LAN, your own binary gets EHOSTUNREACH, and nothing appears in System Settings. Here is what macOS is actually doing, and the .app wrapper that fixes it."
