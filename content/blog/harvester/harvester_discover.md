@@ -1,5 +1,6 @@
 ---
-title: "Discovering HCI Project Harvester"
+title: "Harvester HCI: what it is and how to install it"
+description: "Harvester is SUSE's open source HCI platform built on Kubernetes, KubeVirt and Longhorn. A hands-on install and a first virtual machine, with screenshots."
 date: 2021-03-17T13:07:15+01:00
 image: "/harv_screenshots/Harvester_install1_Grub.png"
 draft: false
@@ -191,4 +192,10 @@ Congratulations! You now have created a VM in your new Harvester Installation, a
 ## Conclusion
 Though this article seems long because of the screenshots, you see that the installation of Harvester is pretty straightforward and that the creation of a new VM is possible after a couple of minutes. You also see that there is no need to have any understanding of Kubernetes or how Kubernetes works to install and use Harvester. 
 This first article only scratches the surface of what is possible to do using Harvester. I will try to deep dive into more Harvester topics in the futures. If you have any questions, please post them in the comments sections. I will be more than happy to answer them.
+
+## Related posts
+
+- [Harvester networking: attaching a VM to a bridged network](/blog/harvester/harvester_bridge_network/) makes a VM reachable from your LAN instead of only from inside the cluster.
+- [Rancher Turtles with Harvester](/blog/harvester/rancher_turtles_with_harvester/) uses Cluster API to provision downstream Kubernetes clusters on the VMs you just learned to create.
+
 

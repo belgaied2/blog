@@ -1,5 +1,6 @@
 ---
-title: Harvester VM with Bridged Network
+title: "Harvester networking: attaching a VM to a bridged network"
+description: "Give a Harvester VM an address on your LAN: configure a host network interface, add a VLAN, and attach the virtual machine with bridged networking."
 date: 2021-03-29T20:48:37.837Z
 author: Mohamed Belgaied Hassine
 draft: false
@@ -149,3 +150,9 @@ ubuntu@ubuntu-1:~$
 In this article, using Harvester, we defined a Host Network Interface to be used for VM Network bridging, then we associated a VLAN and made a new VM join that VLAN and use DHCP to get an IP Address. Then, we used Harvester's API to get the IP address of the VM on the bridge network and connected successfully to the VM using SSH. This process will be greatly improved and simplified in the future. But, at least until then, you can also do it relatively easily using this method. 
 
 Does this method also work for you? Did you have issues? Please let me know in the comments below and I will be more than happy to engage with you.
+
+## Related posts
+
+- [What Harvester HCI is and how to install it](/blog/harvester/harvester_discover/) is the starting point if you have not built the cluster yet.
+- [Rancher Turtles with Harvester](/blog/harvester/rancher_turtles_with_harvester/) shows how to let Cluster API create and manage Kubernetes clusters on Harvester.
+

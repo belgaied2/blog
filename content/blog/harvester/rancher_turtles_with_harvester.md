@@ -1,5 +1,6 @@
 ---
-title: Using the new Rancher Turtles (Cluster API for Rancher) with Harvester
+title: "Rancher Turtles with Harvester: Cluster API in practice"
+description: "Deploy Kubernetes clusters on Harvester VMs with Rancher Turtles and Cluster API: install the provider, create a CAPI cluster, and import it into Rancher."
 date: 2024-07-19T18:17:37.837Z
 author: Mohamed Belgaied Hassine
 draft: false
@@ -253,7 +254,11 @@ You can also check out the logs of the different provider controllers:
 
 At the end of the process, you should see the CAPI Cluster `test-rk` in the `example-rke2` namespace gets to the state `Provisioned`, and the cluster should also appeared as a Downstream Cluster in Rancher.
 
--- END --
+## Related posts
+
+- New to Harvester? [What Harvester HCI is and how to install it](/blog/harvester/harvester_discover/) covers the platform and a first VM.
+- Need the VMs reachable from your LAN instead of Harvester's internal network? [Harvester networking: attaching a VM to a bridged network](/blog/harvester/harvester_bridge_network/).
+
 
 
 
