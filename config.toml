@@ -1,10 +1,13 @@
-baseURL = "http://www.belgai.de/"
+baseURL = "https://www.belgai.de/"
 languageCode = "en-us"
 title = "Kubernetes Ravings"
 theme = "mediumish-gohugo-theme"
 copyright = "Mohamed Belgaied Hassine - All rights reserved"
 disqusShortname = "kubernetes-ravings"
-googleAnalytics = "UA-2401111704"
+enableRobotsTXT = true
+
+[params]
+  description = "Notes on Kubernetes, virtualization, and the tooling around them."
 
 [params.author]
   name = "Mohamed Belgaied Hassine"

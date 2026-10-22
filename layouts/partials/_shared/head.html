@@ -1,0 +1,78 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	{{ hugo.Generator }}
+	{{ with .Site.Params.logo }}
+	<link rel="icon" href="{{ . | urlize | relURL }}">
+	{{ end }}
+
+	{{/* Title: keep the home page from rendering "Site | Site". */}}
+	{{ $title := .Site.Title }}
+	{{ if not .IsHome }}
+		{{ $title = printf "%s | %s" .Title .Site.Title }}
+	{{ end }}
+	<title>{{ $title }}</title>
+
+	{{/* Description: front matter, then summary, then the site-wide fallback. */}}
+	{{ $desc := .Description }}
+	{{ if not $desc }}{{ with .Params.description }}{{ $desc = . }}{{ end }}{{ end }}
+	{{ if not $desc }}{{ with .Summary }}{{ $desc = . | plainify | htmlUnescape }}{{ end }}{{ end }}
+	{{ if not $desc }}{{ $desc = .Site.Params.description }}{{ end }}
+	{{ with $desc }}<meta name="description" content="{{ . | plainify | truncate 158 }}">
+	{{ end }}
+
+	<link rel="canonical" href="{{ .Permalink }}">
+
+	{{ template "_internal/opengraph.html" . }}
+	{{ template "_internal/twitter_cards.html" . }}
+
+	{{ if .IsPage }}
+	{{ $author := .Site.Params.author.name }}
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "BlogPosting",
+		"headline": {{ .Title | jsonify }},
+		"description": {{ with $desc }}{{ . | plainify | truncate 200 | jsonify }}{{ else }}{{ .Title | jsonify }}{{ end }},
+		"datePublished": {{ .Date.Format "2006-01-02T15:04:05Z07:00" | jsonify }},
+		"dateModified": {{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" | jsonify }},
+		"url": {{ .Permalink | jsonify }},
+		"mainEntityOfPage": {
+			"@type": "WebPage",
+			"@id": {{ .Permalink | jsonify }}
+		},
+		"author": {
+			"@type": "Person",
+			"name": {{ $author | jsonify }}
+		},
+		"publisher": {
+			"@type": "Person",
+			"name": {{ $author | jsonify }}
+		}{{ with .Params.tags }},
+		"keywords": {{ delimit . ", " | jsonify }}{{ end }}{{ with .Params.image }},
+		"image": {{ . | absURL | jsonify }}{{ end }}
+	}
+	</script>
+	{{ end }}
+
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp"
+	 crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel="stylesheet">
+	<link href="{{ "/css/medium.css" | urlize | relURL }}" rel="stylesheet">
+	<link href="{{ "/css/additional.css" | urlize | relURL }}" rel="stylesheet">
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-NEZQ0R96ZR"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-NEZQ0R96ZR');
+	</script>
+	<!-- Custom css -->
+	{{ range .Site.Params.customCSS -}}
+	{{ $style := resources.Get . }}
+	<link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}" crossorigin="anonymous" media="screen">
+	{{- end }}
+</head>
