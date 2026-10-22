@@ -5,7 +5,6 @@ summary: "Deploy Kubernetes clusters on Harvester VMs with Rancher Turtles and C
 date: 2024-07-19T18:17:37.837Z
 author: Mohamed Belgaied Hassine
 draft: false
-comments: true
 tags:
   - Harvester
   - Virtualization

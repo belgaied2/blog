@@ -4,7 +4,6 @@ summary: "Why a CLI or a background service cannot reach your LAN on macOS, what
 date: 2026-10-22T09:00:00+02:00
 draft: false
 author: Mohamed Belgaied Hassine
-comments: true
 description: "curl reaches the LAN, your own binary gets EHOSTUNREACH, and nothing appears in System Settings. Here is what macOS is actually doing, and the .app wrapper that fixes it."
 tags:
   - macOS

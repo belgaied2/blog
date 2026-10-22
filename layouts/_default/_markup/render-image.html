@@ -1,0 +1,10 @@
+{{- $src := .Destination -}}
+{{- $width := "" -}}
+{{- $height := "" -}}
+{{- if hasPrefix $src "/" -}}
+  {{- with (imageConfig (printf "static%s" $src)) -}}
+    {{- $width = .Width -}}
+    {{- $height = .Height -}}
+  {{- end -}}
+{{- end -}}
+<img src="{{ $src | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ with $width }} width="{{ . }}"{{ end }}{{ with $height }} height="{{ . }}"{{ end }} loading="lazy" decoding="async">

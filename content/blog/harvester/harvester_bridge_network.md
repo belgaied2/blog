@@ -5,7 +5,6 @@ summary: "Give a Harvester VM an address on your LAN: configure a host network i
 date: 2021-03-29T20:48:37.837Z
 author: Mohamed Belgaied Hassine
 draft: false
-comments: true
 tags:
   - Harvester
   - Virtualization
@@ -150,7 +149,7 @@ ubuntu@ubuntu-1:~$
 # Conclusion
 In this article, using Harvester, we defined a Host Network Interface to be used for VM Network bridging, then we associated a VLAN and made a new VM join that VLAN and use DHCP to get an IP Address. Then, we used Harvester's API to get the IP address of the VM on the bridge network and connected successfully to the VM using SSH. This process will be greatly improved and simplified in the future. But, at least until then, you can also do it relatively easily using this method. 
 
-Does this method also work for you? Did you have issues? Please let me know in the comments below and I will be more than happy to engage with you.
+Does this method work for you? If something here is wrong or has changed in a newer Harvester release, [open an issue on GitHub](https://github.com/belgaied2/blog/issues) and I will update the post.
 
 ## Related posts
 
