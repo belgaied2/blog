@@ -1,0 +1,19 @@
+# Canonical host, plus the apex redirect.
+# Deployed at /etc/caddy/conf.d/www.caddy
+www.belgai.de {
+	import hsts
+	root * /var/www/blog
+	encode zstd gzip
+	file_server
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+	@static path /css/* /js/* /images/* /hv_turtles/* /harv_screenshots/*
+	header @static Cache-Control "public, max-age=604800"
+}
+
+belgai.de {
+	import hsts
+	redir https://www.belgai.de{uri} permanent
+}

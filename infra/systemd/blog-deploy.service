@@ -1,0 +1,11 @@
+[Unit]
+Description=Update belgai.de from the gh-pages branch
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/var/www/blog
+ExecStart=/usr/bin/git fetch --depth 1 origin gh-pages
+ExecStart=/usr/bin/git reset --hard FETCH_HEAD
+ExecStart=/usr/bin/git clean -fd

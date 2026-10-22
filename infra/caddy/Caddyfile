@@ -1,0 +1,33 @@
+# The original Caddyfile on ionos1, with the conf.d import added so the blog
+# and www site blocks can live in separate files.
+#
+# Deployed at /etc/caddy/Caddyfile. See infra/README.md.
+
+(hsts) {
+  header Strict-Transport-Security max-age=63072000
+}
+
+:80 {
+	# Set this path to your site's directory.
+	root * /usr/share/caddy
+
+	# Enable the static file server.
+	file_server
+}
+
+nextcloud.belgai.de {
+	import hsts
+	reverse_proxy 100.116.35.45:8180
+}
+
+harbor.belgai.de {
+	import hsts
+	reverse_proxy 192.168.1.199:8083
+}
+
+signaling.belgai.de {
+	import hsts
+	reverse_proxy 100.116.35.45:8091
+}
+
+import /etc/caddy/conf.d/*.caddy

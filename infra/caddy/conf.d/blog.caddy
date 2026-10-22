@@ -1,0 +1,15 @@
+# Staging host: same content, kept out of the index.
+# Deployed at /etc/caddy/conf.d/blog.caddy
+blog.belgai.de {
+	import hsts
+	root * /var/www/blog
+	encode zstd gzip
+	header X-Robots-Tag "noindex, nofollow"
+	file_server
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+	@static path /css/* /js/* /images/* /hv_turtles/* /harv_screenshots/*
+	header @static Cache-Control "public, max-age=604800"
+}
