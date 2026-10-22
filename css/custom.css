@@ -1,0 +1,178 @@
+/* The theme hard-codes the site name as an <h1> in .mainheading, which gives
+   every article two H1s. Outside the home page it is a <p>, so it needs the
+   heading sizes applied manually. Mirrors Bootstrap 4's h1. */
+.mainheading p.sitetitle {
+    font-family: Merriweather;
+    font-size: 2.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: .5rem;
+}
+
+/* Home page */
+.home {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 1rem 3rem;
+}
+
+.home-intro {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    margin-bottom: 2.75rem;
+}
+
+.home-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: 0 0 80px;
+}
+
+.home-name {
+    font-size: 1.65rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 .2rem;
+}
+
+.home-role {
+    color: rgba(0, 0, 0, .55);
+    font-size: 1rem;
+    margin: 0 0 .6rem;
+}
+
+.home-pitch {
+    font-size: 1.05rem;
+    line-height: 1.55;
+    margin: 0 0 .65rem;
+}
+
+.home-startline {
+    font-size: .95rem;
+    color: rgba(0, 0, 0, .6);
+    margin: 0 0 .65rem;
+}
+
+.home-links {
+    font-size: .95rem;
+    margin: 0;
+}
+
+.home-section {
+    margin-bottom: 2.5rem;
+}
+
+.home-heading {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: rgba(0, 0, 0, .45);
+    border-bottom: 1px solid rgba(0, 0, 0, .08);
+    padding-bottom: .45rem;
+    margin-bottom: 1.2rem;
+}
+
+.home-entry {
+    margin-bottom: 1.5rem;
+}
+
+.home-entry h3 {
+    font-size: 1.18rem;
+    line-height: 1.35;
+    margin: 0 0 .25rem;
+}
+
+.home-meta {
+    font-size: .82rem;
+    color: rgba(0, 0, 0, .45);
+    margin: 0 0 .4rem;
+}
+
+.home-summary {
+    font-size: .96rem;
+    line-height: 1.55;
+    color: rgba(0, 0, 0, .7);
+    margin: 0;
+}
+
+.home-start {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.home-start li {
+    margin-bottom: .8rem;
+    line-height: 1.5;
+}
+
+.home-topic {
+    display: block;
+    padding: 1rem 1.15rem;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 6px;
+    color: inherit;
+}
+
+.home-topic:hover {
+    border-color: rgba(0, 0, 0, .3);
+    text-decoration: none;
+}
+
+.home-topic strong {
+    display: block;
+    font-size: 1rem;
+}
+
+.home-topic-count {
+    display: inline-block;
+    font-size: .8rem;
+    color: rgba(0, 0, 0, .45);
+    margin-top: .15rem;
+}
+
+.home-topic-blurb {
+    display: block;
+    font-size: .88rem;
+    color: rgba(0, 0, 0, .6);
+    margin-top: .3rem;
+}
+
+@media (max-width: 575px) {
+    .home {
+        padding: 1.25rem 1rem 2rem;
+    }
+    .home-intro {
+        gap: .9rem;
+        margin-bottom: 1.75rem;
+    }
+    .home-avatar {
+        width: 56px;
+        height: 56px;
+        flex-basis: 56px;
+    }
+    .home-name {
+        font-size: 1.3rem;
+        margin-bottom: .1rem;
+    }
+    .home-role {
+        font-size: .92rem;
+        margin-bottom: .45rem;
+    }
+    .home-pitch {
+        font-size: .98rem;
+        line-height: 1.5;
+        margin-bottom: .45rem;
+    }
+    .home-startline,
+    .home-links {
+        font-size: .9rem;
+        margin-bottom: .4rem;
+    }
+    .home-entry h3 {
+        font-size: 1.08rem;
+    }
+}
