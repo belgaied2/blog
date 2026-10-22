@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: http://www.belgai.de/sitemap.xml
+Sitemap: https://www.belgai.de/sitemap.xml
