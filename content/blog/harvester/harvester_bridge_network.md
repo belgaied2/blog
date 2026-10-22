@@ -1,6 +1,7 @@
 ---
 title: "Harvester networking: attaching a VM to a bridged network"
 description: "Give a Harvester VM an address on your LAN: configure a host network interface, add a VLAN, and attach the virtual machine with bridged networking."
+summary: "Give a Harvester VM an address on your LAN: configure a host network interface, add a VLAN, and attach the VM with bridged networking."
 date: 2021-03-29T20:48:37.837Z
 author: Mohamed Belgaied Hassine
 draft: false

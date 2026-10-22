@@ -1,5 +1,6 @@
 ---
 title: "macOS Local Network Privacy: why your CLI gets EHOSTUNREACH and how to fix it"
+summary: "Why a CLI or a background service cannot reach your LAN on macOS, what EHOSTUNREACH really means, and the signed .app wrapper that fixes it."
 date: 2026-10-22T09:00:00+02:00
 draft: false
 author: Mohamed Belgaied Hassine

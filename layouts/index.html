@@ -1,0 +1,79 @@
+{{ define "header" }}
+    {{- partial "_shared/navbar.html" . -}}
+{{ end }}
+
+{{ define "main" }}
+{{ $posts := (where .Site.RegularPages "Section" "blog").ByDate.Reverse }}
+<div class="home">
+
+    <section class="home-intro">
+        {{ with .Site.Params.index.picture }}
+        <img src="{{ . | urlize | relURL }}" class="home-avatar" alt="{{ $.Site.Params.index.title }}">
+        {{ end }}
+        <div>
+            <h1 class="home-name">{{ .Site.Params.index.title }}</h1>
+            <p class="home-role">{{ .Site.Params.index.subtitle }}</p>
+            <p class="home-pitch">{{ .Site.Params.index.pitch }}</p>
+            {{ with .Site.Params.index.start_url }}
+            <p class="home-startline">New here? Start with <a href="{{ . }}">{{ $.Site.Params.index.start_label }}</a>.</p>
+            {{ end }}
+            <p class="home-links">
+                {{ with .Site.Params.social.github }}<a href="https://github.com/{{ . }}">GitHub</a>{{ end }}
+                {{ with .Site.Params.social.linkedin }} · <a href="https://www.linkedin.com/in/{{ . }}">LinkedIn</a>{{ end }}
+                · <a href="{{ "index.xml" | absURL }}">RSS</a>
+            </p>
+        </div>
+    </section>
+
+    <section class="home-section">
+        <h2 class="home-heading">Latest</h2>
+        {{ range first 4 $posts }}
+        <article class="home-entry">
+            <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+            <p class="home-meta">{{ .Date.Format "2 Jan 2006" }} · {{ .ReadingTime }} min read{{ with .Params.tags }} · {{ delimit (first 2 .) ", " }}{{ end }}</p>
+            <p class="home-summary">{{ .Summary | plainify | htmlUnescape | truncate 200 }}</p>
+        </article>
+        {{ end }}
+    </section>
+
+    {{/* With a small archive this would just repeat the list above. */}}
+    {{ if gt (len $posts) 4 }}
+    <section class="home-section">
+        <h2 class="home-heading">Start here</h2>
+        <ul class="home-start">
+            {{ range .Site.Params.start_here }}
+            <li><a href="{{ .url }}">{{ .title }}</a> &mdash; {{ .note }}</li>
+            {{ end }}
+        </ul>
+    </section>
+    {{ end }}
+
+    <section class="home-section">
+        <h2 class="home-heading">Topics</h2>
+        <div class="row">
+            {{ range .Site.Params.topics }}
+            {{ $topic := . }}
+            {{ with $.Site.GetPage .path }}
+            <div class="col-md-6 mb-3">
+                <a class="home-topic" href="{{ .RelPermalink }}">
+                    <strong>{{ $topic.label | default .Title }}</strong>
+                    <span class="home-topic-count">{{ len .Pages }} post{{ if ne (len .Pages) 1 }}s{{ end }}</span>
+                    <span class="home-topic-blurb">{{ $topic.blurb }}</span>
+                </a>
+            </div>
+            {{ end }}
+            {{ end }}
+        </div>
+    </section>
+
+    <section class="home-section">
+        <h2 class="home-heading">About</h2>
+        <p>{{ .Site.Params.index.about }} <a href="/about/">More about me</a>.</p>
+    </section>
+
+</div>
+{{ end }}
+
+{{ define "footer" }}
+    {{- partial "_shared/footer.html" . -}}
+{{ end }}

@@ -1,6 +1,7 @@
 ---
 title: "Harvester HCI: what it is and how to install it"
 description: "Harvester is SUSE's open source HCI platform built on Kubernetes, KubeVirt and Longhorn. What it is, when it fits, the hardware it needs, and a hands-on install."
+summary: "What Harvester is, the hardware it needs in v1.9, when it fits and when it does not, and a walkthrough of the install."
 date: 2021-03-17T13:07:15+01:00
 lastmod: 2026-10-22T15:30:00+02:00
 image: "/harv_screenshots/Harvester_install1_Grub.png"

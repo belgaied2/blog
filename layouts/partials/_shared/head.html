@@ -32,34 +32,39 @@
 	{{ template "_internal/opengraph.html" . }}
 	{{ template "_internal/twitter_cards.html" . }}
 
-	{{ if .IsPage }}
-	{{ $author := .Site.Params.author.name }}
-	<script type="application/ld+json">
-	{
-		"@context": "https://schema.org",
-		"@type": "BlogPosting",
-		"headline": {{ .Title | jsonify }},
-		"description": {{ with $desc }}{{ . | plainify | truncate 200 | jsonify }}{{ else }}{{ .Title | jsonify }}{{ end }},
-		"datePublished": {{ .Date.Format "2006-01-02T15:04:05Z07:00" | jsonify }},
-		"dateModified": {{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" | jsonify }},
-		"url": {{ .Permalink | jsonify }},
-		"mainEntityOfPage": {
-			"@type": "WebPage",
-			"@id": {{ .Permalink | jsonify }}
-		},
-		"author": {
-			"@type": "Person",
-			"name": {{ $author | jsonify }}
-		},
-		"publisher": {
-			"@type": "Person",
-			"name": {{ $author | jsonify }}
-		}{{ with .Params.tags }},
-		"keywords": {{ delimit . ", " | jsonify }}{{ end }}{{ with .Params.image }},
-		"image": {{ . | absURL | jsonify }}{{ end }}
-	}
-	</script>
+	{{ if .IsHome }}
+	{{ $person := dict
+		"@context" "https://schema.org"
+		"@type" "Person"
+		"name" .Site.Params.author.name
+		"jobTitle" "Consulting Engineer"
+		"worksFor" (dict "@type" "Organization" "name" "SUSE")
+		"url" .Site.BaseURL
+		"sameAs" (slice
+			(printf "https://github.com/%s" .Site.Params.social.github)
+			(printf "https://www.linkedin.com/in/%s" .Site.Params.social.linkedin))
+	}}
+	<script type="application/ld+json">{{ $person | jsonify | safeJS }}</script>
 	{{ end }}
+
+	{{ if .IsPage }}
+	{{ $ld := dict
+		"@context" "https://schema.org"
+		"@type" "BlogPosting"
+		"headline" .Title
+		"description" (default .Title $desc | plainify | truncate 200)
+		"datePublished" (.Date.Format "2006-01-02T15:04:05Z07:00")
+		"dateModified" (.Lastmod.Format "2006-01-02T15:04:05Z07:00")
+		"url" .Permalink
+		"mainEntityOfPage" (dict "@type" "WebPage" "@id" .Permalink)
+		"author" (dict "@type" "Person" "name" .Site.Params.author.name)
+		"publisher" (dict "@type" "Person" "name" .Site.Params.author.name)
+	}}
+	{{ with .Params.tags }}{{ $ld = merge $ld (dict "keywords" (delimit . ", ")) }}{{ end }}
+	{{ with .Params.image }}{{ $ld = merge $ld (dict "image" (. | absURL)) }}{{ end }}
+	<script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
+	{{ end }}
+
 
 	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp"
@@ -67,7 +72,7 @@
 	<link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel="stylesheet">
 	<link href="{{ "/css/medium.css" | urlize | relURL }}" rel="stylesheet">
 	<link href="{{ "/css/additional.css" | urlize | relURL }}" rel="stylesheet">
-	<link href="{{ "/css/sitetitle-fix.css" | urlize | relURL }}" rel="stylesheet">
+	<link href="{{ "/css/custom.css" | urlize | relURL }}" rel="stylesheet">
 	<!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-NEZQ0R96ZR"></script>
 	<script>

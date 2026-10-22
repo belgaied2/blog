@@ -1,6 +1,7 @@
 ---
 title: "Rancher Turtles with Harvester: Cluster API in practice"
 description: "Deploy Kubernetes clusters on Harvester VMs with Rancher Turtles and Cluster API: install the provider, create a CAPI cluster, and import it into Rancher."
+summary: "Deploy Kubernetes clusters on Harvester VMs with Rancher Turtles and Cluster API, from installing the provider to importing the cluster."
 date: 2024-07-19T18:17:37.837Z
 author: Mohamed Belgaied Hassine
 draft: false

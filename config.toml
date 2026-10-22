@@ -15,13 +15,47 @@ enableRobotsTXT = true
   description = "Creator of this blog."
 
 [params.index]
-  picture = "/images/profile.png"
+  picture = "/images/profile_min.jpg"
   title = "Mohamed Belgaied Hassine"
   subtitle = "I'm a Consulting Engineer at Rancher, now part of SUSE"
+  pitch = "I write about Kubernetes, virtualization, and the parts of running infrastructure on your own hardware that nobody documents."
+  start_label = "the Harvester guide"
+  start_url = "/blog/harvester/harvester_discover/"
+  about = "I work on Kubernetes and virtualization at SUSE, and I run most of it at home before writing about it."
   mdtext = '''
 This site will compile some of my learnings in the Kubernetes space!
 '''
   alertbar = false
+
+[[params.start_here]]
+  url = "/blog/harvester/harvester_discover/"
+  title = "Harvester HCI: what it is and how to install it"
+  note = "start here if you have never run Harvester"
+
+[[params.start_here]]
+  url = "/blog/harvester/harvester_bridge_network/"
+  title = "Harvester networking: attaching a VM to a bridged network"
+  note = "the step that makes a VM reachable from your LAN"
+
+[[params.start_here]]
+  url = "/blog/harvester/rancher_turtles_with_harvester/"
+  title = "Rancher Turtles with Harvester"
+  note = "let Cluster API provision clusters on Harvester VMs"
+
+[[params.start_here]]
+  url = "/blog/macos/local-network-privacy/"
+  title = "macOS Local Network Privacy"
+  note = "why your CLI gets EHOSTUNREACH on the LAN, and the fix"
+
+[[params.topics]]
+  label = "Harvester & Kubernetes"
+  path = "/blog/harvester"
+  blurb = "HCI, bridged networking, and Cluster API"
+
+[[params.topics]]
+  label = "macOS & local AI"
+  path = "/blog/macos"
+  blurb = "Local network access, CLI tooling, MCP servers"
 
 [params.social]
   github = "belgaied2"
