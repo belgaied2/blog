@@ -1,0 +1,13 @@
+<!-- Site Title
+================================================== -->
+<div class="mainheading">
+    {{ if .IsHome }}
+    <h1 class="sitetitle">{{ .Site.Title }}</h1>
+    {{ else }}
+    {{/* The post title is the page's only H1; the site name is not a heading. */}}
+    <p class="sitetitle">{{ .Site.Title }}</p>
+    {{ end }}
+    <p class="lead">
+         {{ .Site.Params.Description }}
+    </p>
+</div>
