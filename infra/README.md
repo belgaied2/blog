@@ -13,10 +13,24 @@ from this directory.
 |---|---|
 | Host | `ionos1`, IONOS VPS, Ubuntu 24.04 |
 | Public address | `82.165.244.121` |
-| Tailscale | `100.79.140.35` |
+| Tailscale | `100.79.140.35`, accepts subnet routes (`RouteAll`) |
 | Web server | Caddy 2.11, systemd unit `caddy` |
 | Document root | `/var/www/blog` |
 | Certificates | Let's Encrypt, issued and renewed by Caddy |
+
+LAN addresses are reachable because `optiplex1` advertises `192.168.0.0/23`
+and `ionos1` accepts routes. Without a subnet router on the tailnet, the
+`nextcloud` and `harbor` blocks below cannot reach their backends.
+
+## Services behind the proxy
+
+| Site | Backend | Notes |
+|---|---|---|
+| `nextcloud.belgai.de` | `100.116.35.45:8180` | optiplex1 over the tailnet |
+| `harbor.belgai.de` | `192.168.1.199:8083` | lenovo-m720-1 over the subnet route |
+| `signaling.belgai.de` | `100.116.35.45:8091` | optiplex1 over the tailnet |
+| `www` / `belgai.de` | `/var/www/blog` | static Hugo output |
+| `blog.belgai.de` | `/var/www/blog` | staging, `noindex` |
 
 ## How a post goes live
 
@@ -86,6 +100,12 @@ NXDOMAIN for any subdomain without an explicit record instead of forwarding to
 Cloudflare. Every hostname needs a local A record. `www`, `belgai.de` and `blog`
 are defined; new subdomains are not reachable from the LAN until they are added.
 
+This also means a `dig` or `nslookup` from inside the LAN does **not** show what
+the internet sees: Pi-hole has local A records for `nextcloud.belgai.de` and
+`harbor.belgai.de` pointing at `192.168.1.47`, while public DNS points at this
+VPS. Check public resolution with `nslookup <name> 1.1.1.1` before concluding a
+subdomain is misconfigured.
+
 ## SSH
 
 Key-only. `/etc/ssh/sshd_config.d/00-hardening.conf` sets:
@@ -102,9 +122,8 @@ uses the first value it encounters.
 
 ## Known issues
 
-- `harbor.belgai.de` reverse-proxies to `192.168.1.199:8083`, a LAN address the
-  VPS cannot route. It returns 502 for every visitor. It should use a tailnet
-  address like the `nextcloud` block does.
-- Public DNS for `nextcloud.belgai.de` and `harbor.belgai.de` points at
-  `192.168.1.47`, so those Caddy blocks never receive external traffic.
 - The `:80` default site still serves the stock `/usr/share/caddy` placeholder.
+- Harbor's containers stopped in August after the host disk filled (`No space
+  left on device` in `harbor-db`). The stack was restarted in October; the host
+  is at 78% disk, so keep an eye on it. To restart:
+  `ssh lenovo-m720-1 'cd ~/harbor && sudo docker compose up -d'`
