@@ -122,7 +122,6 @@ uses the first value it encounters.
 
 ## Known issues
 
-- The `:80` default site still serves the stock `/usr/share/caddy` placeholder.
 - Harbor's containers stopped in August after the host disk filled (`No space
   left on device` in `harbor-db`). The stack was restarted in October; the host
   is at 78% disk, so keep an eye on it. To restart:

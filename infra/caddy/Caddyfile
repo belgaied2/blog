@@ -8,11 +8,9 @@
 }
 
 :80 {
-	# Set this path to your site's directory.
-	root * /usr/share/caddy
-
-	# Enable the static file server.
-	file_server
+	# Anything reaching port 80 without a matching site block (the bare IP,
+	# unknown hostnames) goes to the canonical site.
+	redir https://www.belgai.de{uri} permanent
 }
 
 nextcloud.belgai.de {
