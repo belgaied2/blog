@@ -284,3 +284,32 @@ details.post-toc[open] {
         font-size: .85rem;
     }
 }
+
+/* Wide content should scroll inside the article, never widen the page. */
+.article-post pre {
+    overflow-x: auto;
+}
+
+.article-post table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+}
+
+.article-post table th,
+.article-post table td {
+    padding: .4rem .6rem;
+    border: 1px solid rgba(0, 0, 0, .1);
+    font-size: .92rem;
+}
+
+/* Long identifiers in inline code must wrap instead of widening the page. */
+.article-post code {
+    overflow-wrap: anywhere;
+}
+
+/* Leave room for the copy button above the first line of code. */
+.article-post pre {
+    padding-top: 2.1rem;
+}
