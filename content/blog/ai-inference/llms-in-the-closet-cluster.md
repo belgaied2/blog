@@ -1,7 +1,7 @@
 ---
-title: "LLMs in the closet cluster: HAMi, Kaito and llm-d on a homelab"
-description: "Three mismatched GPUs, one of them rented by the hour. What GPU slicing, vLLM and cache-aware routing actually buy you at home, with the measured numbers and the failure modes."
-summary: "Three mismatched GPUs, one of them rented by the hour. What GPU slicing, vLLM and cache-aware routing actually buy you at home, with the measured numbers and the failure modes."
+title: "LLMs on homelab Kubernetes: llm-d, vLLM, HAMi and Kaito"
+description: "GPU sharing, vLLM and cache-aware routing on hardware you own, and how much of the production AI inference stack you can learn at home."
+summary: "GPU sharing, vLLM and cache-aware routing on hardware you own, and how much of the production AI inference stack you can learn at home."
 date: 2026-10-23T10:00:00+02:00
 tags:
   - Kubernetes
@@ -51,7 +51,7 @@ Inference you can point at is worth more than a benchmark. The cluster serves:
 
 Privacy is the honest motivation: documents, photos and family conversations never leave the network. Offline is the second. But local covers the boring 80%, not the hard 20%: a small model greeted the audience with *"Hello, KCD Edinburgh — your Graph Partitioning Enthusiasts' meeting spot since 1993!"*
 
-## HAMi: one 11 GB card, four workloads
+## HAMi: GPU sharing, four workloads on one 11 GB card
 
 This is the part worth doing even if you skip everything else. HAMi slices GPU memory between pods. On the 1080 Ti, four services ran at once:
 
@@ -79,7 +79,7 @@ Refused at the slice boundary while the card still had ~7 GB free. That is the f
 
 Two limits matter. It is **memory isolation, not performance isolation**: a busy pod slows its neighbours. And **anything on the GPU outside Kubernetes is invisible to HAMi** — Open WebUI, running in Docker on the same machine, quietly held 242 MiB for its built-in embeddings until I pointed it at the cluster's service.
 
-## The unsupported card is the fastest one
+## The RX 6900 XT: the fastest card that supports nothing
 
 The RX 6900 XT has no HAMi, no Kaito, no vLLM. It is a plain Deployment running llama.cpp on Vulkan, and it is **the fastest card in the cluster**: on the same Llama 3.2 3B, **177.7 tok/s against the 1080 Ti's 99.0**.
 
@@ -140,7 +140,7 @@ And the honest part: **with one replica, there is nothing to choose between.** l
 
 Two practical notes. Kaito only creates the InferencePool and router for an `InferenceSet`; a plain `Workspace` gets none. And neither Cilium's gateway nor Traefik implements the Gateway API Inference Extension, so Istio runs gateway-only next to Cilium, no sidecars.
 
-## Cold starts are the real cost
+## Cold starts: 22 minutes for an image, 28 for a model
 
 Kubernetes is not slow. Pulling five gigabytes of weights is.
 
@@ -153,6 +153,12 @@ Kubernetes is not slow. Pulling five gigabytes of weights is.
 | llama.cpp Vulkan, model cached | 36 s |
 
 And then the rented-GPU lesson: **destroying the vast.ai instance deletes the image and the weights with it.** The next node starts the 22 + 28 minutes again. Ephemeral inference only works if images and models are cached somewhere that outlives the GPU — a registry mirror and a model store on real disks. I learned that the expensive way, twice.
+
+## vLLM or Ollama?
+
+I did not benchmark Ollama on these cards, so this is an argument, not a measurement. Ollama is one binary serving one model to one user, and it is the right answer for most homelabs.
+
+vLLM's advantage appears when requests arrive together: **223,622 tokens per minute** at 40 concurrent requests on one 3090 is a different class of throughput from a single-user server. It also exposes the queue and KV-cache metrics that llm-d needs in order to route. If you are the only user, the difference is operational. If several people or apps share the endpoint, it is the point.
 
 ## The verdict
 
@@ -167,7 +173,15 @@ My first reason is **learning**, the second is **privacy**. You will not save mo
 
 The professional argument is real, though. vLLM, the Gateway API Inference Extension and llm-d are the same building blocks showing up in production platforms, and a homelab is the cheapest place to break them: *my homelab is where I broke llm-d before I had to explain it to a customer.*
 
-## The mistakes that cost an evening
+## What this teaches you about production inference
+
+The stack in this post is not a homelab toy version of something else. It is the same shape as what teams run in production: a GPU operator for device management, HAMi or MIG for sharing, vLLM for serving, the Gateway API Inference Extension for routing, and an autoscaler or model operator above it.
+
+What changes at work is scale and consequence, not vocabulary. A replica that takes 28 minutes to become Ready is a demo problem at home and an incident in production. A device plugin that fights another one is a puzzling evening here and a failed rollout there.
+
+That is the argument for running this at home: you meet the failure modes on hardware where the blast radius is your own weekend.
+
+## Pitfalls: HAMi, Kaito and llm-d
 
 - **One device plugin per GPU vendor.** HAMi replaces NVIDIA's. Disable the GPU Operator's and Kaito's, or they fight.
 - **One NFD.** Two Node Feature Discovery instances cost me the GPU labels Kaito sizes vLLM from.
@@ -176,6 +190,28 @@ The professional argument is real, though. vLLM, the Gateway API Inference Exten
 - **Rolling updates need spare VRAM.** On a fully sliced card the new pod stays `Pending` next to the old one. Use `strategy: Recreate`.
 - **A "supported" CUDA image may not support your GPU.** The official whisper.cpp CUDA image skips Pascal; it fails at the first request, not at startup. Test a real request before calling a workload Ready.
 - **OpenAI-compatible isn't always compatible.** Open WebUI sends `tool_choice: "auto"`, which vLLM rejects unless started with `--enable-auto-tool-choice` and a tool-call parser. Kaito does not set them.
+
+## FAQ
+
+### Does HAMi work with AMD GPUs?
+
+Instinct cards only. The RX 6900 XT is not supported; it runs llama.cpp on Vulkan instead.
+
+### Can vLLM run on a GTX 1080 Ti?
+
+No. vLLM needs compute capability 7.0 or newer (Volta and later); Pascal is 6.1. llama.cpp CUDA works on the same card.
+
+### How much VRAM does a 7B model need at Q4?
+
+Roughly 0.6 GB per billion parameters for the weights, plus the KV cache. A 7B model at Q4_K_M is about 4.5 GB, so plan for 6 to 8 GB to leave room for context.
+
+### Is Kubernetes worth it for a single GPU?
+
+No. Ollama or LM Studio on the host gives you one moving part. Kubernetes starts paying off with several services, several GPUs, or GPUs that join and leave.
+
+### Why does llm-d need more than one replica?
+
+The router picks a replica per request, scoring queue depth, KV-cache use and prefix affinity. With one replica there is nothing to choose between, so it is plumbing without a payoff.
 
 ## What I did not do
 
