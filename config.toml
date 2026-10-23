@@ -21,7 +21,7 @@ enableRobotsTXT = true
   pitch = "I write about Kubernetes, virtualization and local AI Inference, and the parts of running infrastructure on your own hardware."
   start_label = "the Harvester guide"
   start_url = "/blog/harvester/harvester_discover/"
-  about = "I work on Kubernetes and virtualization at SUSE, and I run most of it at home before writing about it."
+  about = "I work on Kubernetes and virtualization at Mirantis, and I run most of it at home before writing about it."
   mdtext = '''
 This site will compile some of my learnings in the Kubernetes space!
 '''
