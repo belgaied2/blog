@@ -70,3 +70,9 @@ This site will compile some of my learnings in the Kubernetes space!
     weight = 100
     identifier = "blog"
     url = "/blog"
+
+[[menu.main]]
+    name = "About me"
+    weight = 200
+    identifier = "about"
+    url = "/about/"
