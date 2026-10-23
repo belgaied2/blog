@@ -1,0 +1,6 @@
+[Unit]
+Description=Remove previews for closed pull requests
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/prune-previews.sh

@@ -75,6 +75,10 @@ Previews live under `/var/www/previews/<n>/` and inherit the host's
 | `infra/caddy/conf.d/www.caddy` | `/etc/caddy/conf.d/www.caddy` |
 | `infra/systemd/blog-deploy.service` | `/etc/systemd/system/blog-deploy.service` |
 | `infra/systemd/blog-deploy.timer` | `/etc/systemd/system/blog-deploy.timer` |
+| `infra/systemd/prune-previews.service` | `/etc/systemd/system/prune-previews.service` |
+| `infra/systemd/prune-previews.timer` | `/etc/systemd/system/prune-previews.timer` |
+| `scripts/preview.sh` | `/usr/local/bin/preview.sh` (optional, run from a checkout) |
+| `scripts/prune-previews.sh` | `/usr/local/bin/prune-previews.sh` |
 
 ## Restore on a fresh host
 
