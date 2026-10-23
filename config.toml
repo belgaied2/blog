@@ -17,8 +17,8 @@ enableRobotsTXT = true
 [params.index]
   picture = "/images/profile_min.jpg"
   title = "Mohamed Belgaied Hassine"
-  subtitle = "I'm a Consulting Engineer at Rancher, now part of SUSE"
-  pitch = "I write about Kubernetes, virtualization, and the parts of running infrastructure on your own hardware that nobody documents."
+  subtitle = "I'm a Consulting Architect at Mirantis"
+  pitch = "I write about Kubernetes, virtualization and local AI Inference, and the parts of running infrastructure on your own hardware."
   start_label = "the Harvester guide"
   start_url = "/blog/harvester/harvester_discover/"
   about = "I work on Kubernetes and virtualization at SUSE, and I run most of it at home before writing about it."
@@ -59,7 +59,7 @@ This site will compile some of my learnings in the Kubernetes space!
 
 [params.social]
   github = "belgaied2"
-  linkedin = "mohamed-belgaied-hassine-870a5a4"
+  linkedin = "mohamed-belgaied"
   #xing = "<username>"
   #medium = "<username>"
   twitter = "belgaied2"
