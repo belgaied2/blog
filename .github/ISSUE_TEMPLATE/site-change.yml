@@ -1,0 +1,42 @@
+name: Website change
+description: Request a change or improvement to the site
+title: "[site] "
+labels: ["site"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Which page or section?
+      placeholder: e.g. /blog/harvester/harvester_discover/, or "home page"
+    validations:
+      required: true
+
+  - type: textarea
+    id: change
+    attributes:
+      label: What should change?
+      description: Be specific. For a wording change, paste the current and the proposed text.
+    validations:
+      required: true
+
+  - type: textarea
+    id: done
+    attributes:
+      label: How will we know it is done?
+      description: One or two acceptance criteria are enough.
+      placeholder: |
+        - The table of contents is visible on mobile without scrolling past the intro
+        - No layout shift when the screenshots load
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Rough size
+      options:
+        - Small (text, styling)
+        - Medium (layout, new section)
+        - Large (new page or feature)
+    validations:
+      required: false

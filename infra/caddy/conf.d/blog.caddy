@@ -5,6 +5,13 @@ blog.belgai.de {
 	root * /var/www/blog
 	encode zstd gzip
 	header X-Robots-Tag "noindex, nofollow"
+
+	# Per-issue previews: /preview/123/ maps to /var/www/previews/123/
+	handle_path /preview/* {
+		root * /var/www/previews
+		file_server
+	}
+
 	file_server
 	handle_errors {
 		rewrite * /404.html

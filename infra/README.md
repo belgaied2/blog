@@ -45,6 +45,27 @@ git push master
 No SSH from CI, no secrets in the runner, no rsync. The only credential is the
 VPS's read access to a public repository.
 
+## Site changes: issue → preview → approval
+
+1. Open an issue using the **Website change** template.
+2. The change is implemented on a branch and published to
+   `https://blog.belgai.de/preview/<pr>/` with `scripts/preview.sh <pr>`.
+3. A pull request is opened by the bot account (`belgaied-bot`), linking the
+   issue and carrying the preview URL.
+4. The repository owner reviews the preview and approves the pull request.
+5. `merge-on-approval` squash-merges it using the bot token, so the push to
+   `master` triggers the normal deploy.
+6. `scripts/prune-previews.sh`, run by a systemd timer, removes the preview
+   directory once the pull request is no longer open.
+
+`master` is protected: one approving review, a passing `build` check, no direct
+pushes, enforced for administrators. The bot cannot approve its own work, and
+the owner cannot approve a pull request they authored, which is why the bot
+account exists.
+
+Previews live under `/var/www/previews/<n>/` and inherit the host's
+`X-Robots-Tag: noindex`, so they can never compete with production.
+
 ## File map
 
 | In this repo | On the host |

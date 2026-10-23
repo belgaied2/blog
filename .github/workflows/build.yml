@@ -1,0 +1,38 @@
+name: build
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+
+      # Build with the preview baseURL so the check catches broken internal
+      # links and absolute asset paths, not just template errors.
+      - name: Build
+        run: |
+          hugo --minify \
+            --baseURL "https://blog.belgai.de/preview/pr-${{ github.event.number }}/" \
+            --destination public
+          test -f public/index.html
+          test -f public/sitemap.xml
+
+      - name: Check the sitemap has no localhost URLs
+        run: |
+          if grep -q 'localhost\|127.0.0.1' public/sitemap.xml; then
+            echo "sitemap contains a local URL"; exit 1
+          fi

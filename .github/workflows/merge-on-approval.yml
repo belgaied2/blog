@@ -1,0 +1,27 @@
+name: merge on approval
+
+# The PR author is the bot account, so the repository owner can approve it.
+# Merging with the bot token (not GITHUB_TOKEN) matters: pushes made with the
+# default token do not trigger the deploy workflow.
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: read
+
+jobs:
+  merge:
+    if: >-
+      github.event.review.state == 'approved' &&
+      github.event.pull_request.user.login == 'belgaied-bot' &&
+      github.event.pull_request.base.ref == 'master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge the pull request
+        env:
+          GH_TOKEN: ${{ secrets.BOT_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: gh pr merge "$PR" --repo "$REPO" --squash --delete-branch
