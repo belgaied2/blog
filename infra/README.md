@@ -50,7 +50,7 @@ VPS's read access to a public repository.
 1. Open an issue using the **Website change** template.
 2. The change is implemented on a branch and published to
    `https://blog.belgai.de/preview/<pr>/` with `scripts/preview.sh <pr>`.
-3. A pull request is opened by the bot account (`belgaied-bot`), linking the
+3. A pull request is opened by the bot account (`belgaied2-opencode`), linking the
    issue and carrying the preview URL.
 4. The repository owner reviews the preview and approves the pull request.
 5. `merge-on-approval` squash-merges it using the bot token, so the push to
