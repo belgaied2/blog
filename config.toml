@@ -57,6 +57,11 @@ This site will compile some of my learnings in the Kubernetes space!
   path = "/blog/macos"
   blurb = "Local network access, CLI tooling, MCP servers"
 
+[[params.topics]]
+  label = "Kubernetes AI inference"
+  path = "/blog/ai-inference"
+  blurb = "GPU sharing, vLLM and routing on a homelab cluster"
+
 [params.social]
   github = "belgaied2"
   linkedin = "mohamed-belgaied"
@@ -76,3 +81,6 @@ This site will compile some of my learnings in the Kubernetes space!
     weight = 200
     identifier = "about"
     url = "/about/"
+
+[markup.highlight]
+  style = "github"
