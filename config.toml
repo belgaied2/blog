@@ -76,5 +76,11 @@ This site will compile some of my learnings in the Kubernetes space!
     identifier = "blog"
     url = "/blog"
 
+[[menu.main]]
+    name = "About me"
+    weight = 200
+    identifier = "about"
+    url = "/about/"
+
 [markup.highlight]
   style = "github"
