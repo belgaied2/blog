@@ -26,9 +26,9 @@ and `ionos1` accepts routes. Without a subnet router on the tailnet, the
 
 | Site | Backend | Notes |
 |---|---|---|
-| `nextcloud.belgai.de` | `100.116.35.45:8180` | optiplex1 over the tailnet |
+| `nextcloud.belgai.de` | `192.168.1.85:8180` | Aoostar NAS over the subnet route |
 | `harbor.belgai.de` | `192.168.1.199:8083` | lenovo-m720-1 over the subnet route |
-| `signaling.belgai.de` | `100.116.35.45:8091` | optiplex1 over the tailnet |
+| `signaling.belgai.de` | `192.168.1.85:8091` | Aoostar NAS over the subnet route |
 | `www` / `belgai.de` | `/var/www/blog` | static Hugo output |
 | `blog.belgai.de` | `/var/www/blog` | staging, `noindex` |
 

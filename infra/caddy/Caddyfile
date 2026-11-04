@@ -15,7 +15,7 @@
 
 nextcloud.belgai.de {
 	import hsts
-	reverse_proxy 100.116.35.45:8180
+	reverse_proxy 192.168.1.85:8180
 }
 
 harbor.belgai.de {
@@ -25,7 +25,7 @@ harbor.belgai.de {
 
 signaling.belgai.de {
 	import hsts
-	reverse_proxy 100.116.35.45:8091
+	reverse_proxy 192.168.1.85:8091
 }
 
 import /etc/caddy/conf.d/*.caddy
