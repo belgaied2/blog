@@ -6,6 +6,12 @@
 	<link rel="icon" href="{{ . | urlize | relURL }}">
 	{{ end }}
 
+	<link rel="icon" href="{{ "favicon.ico" | relURL }}" sizes="32x32">
+	<link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
+	<link rel="apple-touch-icon" href="{{ "apple-touch-icon.png" | relURL }}">
+	<link rel="manifest" href="{{ "site.webmanifest" | relURL }}">
+	<meta name="theme-color" content="#038252">
+
 	{{/* Title: keep the home page from rendering "Site | Site". */}}
 	{{ $title := .Site.Title }}
 	{{ if not .IsHome }}
