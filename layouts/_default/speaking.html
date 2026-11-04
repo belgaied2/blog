@@ -30,7 +30,7 @@
             {{ end }}
             {{ with .summary }}<p class="talk-summary">{{ . }}</p>{{ end }}
             {{ with .links }}
-            <p class="talk-links">{{ range . }}<a href="{{ .url }}">{{ .label }}</a>{{ end }}</p>
+            <p class="talk-links">{{ range . }}<a href="{{ strings.TrimPrefix "/" .url | relURL }}">{{ .label }}</a>{{ end }}</p>
             {{ end }}
             {{ end }}
         </article>
