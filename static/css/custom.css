@@ -372,3 +372,29 @@ details.post-toc[open] {
     }
 
 }
+
+/* Brand palette: the theme ships Medium's #00ab6b, replaced here with the
+   deeper green used by the favicon and the rest of the site's accents. */
+a {
+    color: #038252;
+}
+
+a:hover,
+a:focus {
+    color: #026b43;
+}
+
+blockquote {
+    border-left-color: #038252;
+}
+
+.btn.follow {
+    color: #038252;
+    border-color: #038252;
+}
+
+.btn.subscribe,
+.alertbar input[type="submit"] {
+    background-color: #038252;
+    border-color: #038252;
+}
