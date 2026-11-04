@@ -1,0 +1,57 @@
+{{ define "header" }}
+    {{- partial "_shared/navbar.html" . -}}
+{{ end }}
+
+{{ define "main" }}
+{{ $overlay := .Site.Data.speaking.sessions }}
+{{ $sessions := .Site.Data.sessionize.sessions }}
+{{ $events := .Site.Data.sessionize.events }}
+{{ $speaker := .Site.Data.sessionize.speaker }}
+
+<div class="main-content">
+    <div class="mainheading">
+        <h1 class="posttitle">{{ .Title }}</h1>
+    </div>
+
+    {{ with .Content }}
+    <div class="article-post mb-4">{{ . }}</div>
+    {{ end }}
+
+    <section class="article-post">
+        <h2>Talks</h2>
+        {{ range $sessions }}
+        {{ $key := printf "%.0f" .id }}
+        {{ $meta := index $overlay $key }}
+        <article class="talk">
+            <h3><a href="{{ .sessionUrl }}">{{ .title }}</a></h3>
+            {{ with $meta }}
+            {{ if or .event .date }}
+            <p class="talk-meta">{{ with .event }}{{ . }}{{ end }}{{ if and .event .date }} · {{ end }}{{ with .date }}{{ . }}{{ end }}</p>
+            {{ end }}
+            {{ with .summary }}<p class="talk-summary">{{ . }}</p>{{ end }}
+            {{ with .links }}
+            <p class="talk-links">{{ range . }}<a href="{{ .url }}">{{ .label }}</a>{{ end }}</p>
+            {{ end }}
+            {{ end }}
+        </article>
+        {{ end }}
+    </section>
+
+    <section class="article-post">
+        <h2>Where I have spoken</h2>
+        <ul class="talk-events">
+            {{ range sort $events "eventStartDate" "desc" }}
+            <li>
+                <strong>{{ .name }}</strong>
+                <span class="talk-meta">{{ .location }}{{ with .eventStartDate }} · {{ (time.AsTime .).Format "January 2006" }}{{ end }}</span>
+            </li>
+            {{ end }}
+        </ul>
+        <p class="talk-profile"><a href="{{ $speaker.speakerProfileUrl }}">Full speaker profile on Sessionize</a></p>
+    </section>
+</div>
+{{ end }}
+
+{{ define "footer" }}
+    {{- partial "_shared/footer.html" . -}}
+{{ end }}
