@@ -313,3 +313,43 @@ details.post-toc[open] {
 .article-post pre {
     padding-top: 2.1rem;
 }
+
+/* Speaking page */
+.talk {
+    margin-bottom: 2rem;
+}
+
+.talk h3 {
+    font-size: 1.15rem;
+    line-height: 1.35;
+    margin: 0 0 .25rem;
+}
+
+.talk-meta {
+    font-size: .85rem;
+    color: rgba(0, 0, 0, .5);
+    margin: 0 0 .4rem;
+}
+
+.talk-summary {
+    margin: 0 0 .4rem;
+}
+
+.talk-links a {
+    margin-right: .75rem;
+}
+
+.talk-events {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+}
+
+.talk-events li {
+    margin-bottom: .75rem;
+}
+
+.talk-events .talk-meta {
+    display: block;
+    margin: .15rem 0 0;
+}

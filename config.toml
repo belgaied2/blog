@@ -77,6 +77,12 @@ This site will compile some of my learnings in the Kubernetes space!
     url = "/blog"
 
 [[menu.main]]
+    name = "Speaking"
+    weight = 150
+    identifier = "speaking"
+    url = "/speaking/"
+
+[[menu.main]]
     name = "About me"
     weight = 200
     identifier = "about"

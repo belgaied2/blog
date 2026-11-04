@@ -1,0 +1,55 @@
+{
+    "speaker": {
+        "firstName": "Mohamed",
+        "lastName": "Belgaied Hassine",
+        "tagline": "Consulting Architect at Mirantis",
+        "bio": "Born in Tunisia, graduated and first professional experiences in France, Mohamed lives now in Germany since 2013, where he has been doing Consulting for Software vendors, first in the Big Data space, and then in the Cloud native space since 2019.",
+        "speakerProfileUrl": "https://sessionize.com/belgai",
+        "photoUrl": "https://cdn.sessionize.com/image/c2d4-200o200o2-4qTC1aLtEe5gRMABfekmL9.png",
+        "photoLargeUrl": "https://cdn.sessionize.com/image/aacb-1000o1000o1-4qTC1aLtEe5gRMABfekmL9.png"
+    },
+    "sessions": [
+        {
+            "id": 195041,
+            "title": "Can Kubernetes Run AI Inference in Your Homelab? An Honest Answer, with Three CNCF Projects",
+            "description": "There's a Dan Garfield talk from  KubeCon EU 2021  \u2014 \"The Quest for the Ultimate Kubernetes Homelab\" \u2014 that put an idea in a lot of platform engineers' minds: the cluster in your closet isn't a toy, it's where you learn what you do later at work. Five years later, the question has changed: can the homelab cluster now run a useful LLM, the same way it runs your media server and your password manager?\r\n\r\nFor me, yes. With three Kubernetes-native projects: HAMi for GPU sharing, Kaito for declarative model deployment, and LLM-d for KV-cache-aware routing. Do you have more than one Gaming PC? Maybe yours and you son's, or maybe you kept your older GPU? If you add them to your Kubernetes cluster, you are a  couple of minutes away from your own a distributed inference endpoint.\r\n\r\nDoes it make sense against running ollama or LM Studio? I will give you an honest answer.\r\n\r\nYou'll leave knowing exactly what to install on your homelab tonight \u2014 and whether you should.",
+            "sessionUrl": "https://sessionize.com/s/belgai/can-kubernetes-run-ai-inference-in-your-homelab-an/195041",
+            "languageCode": "en",
+            "language": "English"
+        },
+        {
+            "id": 179297,
+            "title": "The Future of AI Inference is Small, Distributed, and Budget-Conscious",
+            "description": "By 2030, 90% of AI workloads will be inference\u2014mostly smaller models at smaller organizations. Yet KubeCon talks focus on massive GPU clusters for frontier labs. We're building infrastructure for the wrong market.\r\n\r\nThis lightning talk argues for a shift: make AI inference accessible to budget-conscious organizations using CNCF projects we already have. I'll sketch a vision combining Cluster API (elastic infrastructure), HAMi (GPU sharing), and Kaito (optimized serving) to create cost-effective, distributed inference for the 90% of organizations who can't afford hyperscaler patterns.\r\n\r\nLet's stop optimizing for OpenAI and Anthropic, and start optimizing for everyone else.",
+            "sessionUrl": "https://sessionize.com/s/belgai/the-future-of-ai-inference-is-small-distributed-an/179297",
+            "languageCode": "en",
+            "language": "English"
+        }
+    ],
+    "events": [
+        {
+            "id": 23976,
+            "name": "KCD UK Edinburgh 2026",
+            "eventStartDate": "2026-10-19T00:00:00",
+            "eventEndDate": "2026-10-20T00:00:00",
+            "location": "Edinburgh, United Kingdom",
+            "website": "https://kcduk.io"
+        },
+        {
+            "id": 21127,
+            "name": "Cloud Native Summit 2026",
+            "eventStartDate": "2026-06-29T00:00:00",
+            "eventEndDate": "2026-06-30T00:00:00",
+            "location": "Munich, Germany",
+            "website": "https://cloudnativesummit.de/"
+        },
+        {
+            "id": 22692,
+            "name": "KCD Czech & Slovak 2026",
+            "eventStartDate": "2026-05-21T00:00:00",
+            "eventEndDate": "2026-05-22T00:00:00",
+            "location": "Prague, Czechia",
+            "website": "https://community.cncf.io/events/details/cncf-kcd-czech-slovak-presents-kcd-czech-amp-slovak-prague-2026/"
+        }
+    ]
+}

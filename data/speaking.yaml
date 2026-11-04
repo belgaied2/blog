@@ -1,0 +1,26 @@
+# Editorial overlay for the Sessionize data.
+#
+# data/sessionize.json is refreshed from the API; this file adds the things the
+# API does not carry: which events a talk was given at, a one-line summary in my
+# own words, and links to the written version.
+#
+# The API returns sessions and events as separate lists with no link between
+# them, so events are recorded here by hand. Order is newest first.
+
+sessions:
+  "195041":
+    events:
+      - name: "KCD UK Edinburgh 2026"
+        date: "October 2026"
+    summary: "The homelab inference talk: three mismatched GPUs, one Kubernetes cluster, and an honest answer about whether HAMi, Kaito and llm-d beat running Ollama."
+    links:
+      - label: "The written version"
+        url: "/blog/ai-inference/llms-in-the-closet-cluster/"
+
+  "179297":
+    events:
+      - name: "Cloud Native Summit 2026"
+        date: "June 2026"
+      - name: "KCD Czech & Slovak 2026"
+        date: "May 2026"
+    summary: "A lightning talk arguing that the next decade of AI infrastructure is small models at small organisations, not frontier clusters."
