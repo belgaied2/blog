@@ -1,6 +1,7 @@
 ---
 title: "About"
 type: static
+image: "/images/profile_about.jpg"
 description: "Mohamed Belgaied Hassine is a consulting architect at Mirantis. He writes about Kubernetes, virtualization, and running infrastructure on his own hardware."
 ---
 
