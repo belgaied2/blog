@@ -353,3 +353,22 @@ details.post-toc[open] {
     display: block;
     margin: .15rem 0 0;
 }
+
+/* About page portrait */
+.about-photo {
+    float: right;
+    width: 240px;
+    height: auto;
+    margin: .25rem 0 1rem 1.5rem;
+    border-radius: 6px;
+}
+
+@media (max-width: 575px) {
+    .about-photo {
+        float: none;
+        display: block;
+        width: 160px;
+        margin: 0 0 1rem;
+    }
+
+}
