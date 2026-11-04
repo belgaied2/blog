@@ -25,8 +25,8 @@
         <article class="talk">
             <h3><a href="{{ .sessionUrl }}">{{ .title }}</a></h3>
             {{ with $meta }}
-            {{ if or .event .date }}
-            <p class="talk-meta">{{ with .event }}{{ . }}{{ end }}{{ if and .event .date }} · {{ end }}{{ with .date }}{{ . }}{{ end }}</p>
+            {{ with .events }}
+            <p class="talk-meta">{{ range $i, $e := . }}{{ if $i }}; {{ end }}{{ $e.name }}{{ with $e.date }} · {{ . }}{{ end }}{{ end }}</p>
             {{ end }}
             {{ with .summary }}<p class="talk-summary">{{ . }}</p>{{ end }}
             {{ with .links }}
