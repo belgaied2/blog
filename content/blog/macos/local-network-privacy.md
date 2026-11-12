@@ -182,3 +182,7 @@ Every agentic tool that talks to something on your LAN now runs into this: a loc
 If you maintain a CLI that ships a background service, the fix belongs in your packaging, not in your users' shell profiles. Ship a bundle, sign it, and associate the launch agent. If you use one, `--standalone` will get you through the afternoon.
 
 I filed the upstream report for OpenCode with the full evidence: [anomalyco/opencode#58080](https://github.com/anomalyco/opencode/issues/58080). The issue references three earlier reports with the same root cause, all closed without a fix.
+
+## Related posts
+
+- [Wrapping OpenCode in a .app to fix macOS LAN access](/blog/macos/opencode-wrapper/) — the full recipe, with the cutover and the upgrade script.
