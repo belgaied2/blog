@@ -18,9 +18,9 @@ keywords:
   - MCP
 ---
 
-[Last time](/blog/macos/local-network-privacy/) I explained *why* a background service on macOS 15+ cannot reach your LAN: Local Network Privacy gates sockets by program identity, and a bare CLI started by `launchd` has no identity to gate. This post is the other half — the wrapper itself, with the actual files, the cutover, and the parts that need redoing after every upgrade.
+[Last time](/blog/macos/local-network-privacy/) I explained *why* a background service on macOS 15+ cannot reach your LAN: Local Network Privacy gates sockets by program identity, and a bare CLI started by `launchd` has no identity to gate. This post is the other half: the wrapper itself, the files, the cutover, and the parts that need redoing after every upgrade.
 
-If you only want the summary: eight files, one `codesign` command, one `launchctl` bootstrap, and a note in your calendar for whenever the tool updates.
+Eight files, one `codesign` command, one `launchctl` bootstrap, and a note in your calendar for update day.
 
 ## What we are building
 
@@ -50,7 +50,7 @@ Create the directory and copy the binary. On Apple Silicon with Homebrew that is
 APP="$HOME/Applications/OpenCode LAN.app"
 mkdir -p "$APP/Contents/MacOS"
 
-# -L because the Homebrew path is usually a symlink into the Cellar
+# -L resolves the Homebrew symlink into the Cellar
 cp -L /opt/homebrew/bin/opencode "$APP/Contents/MacOS/opencode"
 chmod +x "$APP/Contents/MacOS/opencode"
 ```
@@ -81,9 +81,9 @@ Now the `Info.plist`:
 Two details worth understanding:
 
 - **`LSBackgroundOnly`** keeps the app out of the Dock and the app switcher. You are not launching a GUI; you are giving a background service a name badge.
-- **`NSLocalNetworkUsageDescription`** is the sentence macOS shows in the permission dialog. Write it for a person who is about to decide whether you get network access — "OpenCode needs network access" is not an answer to that question.
+- **`NSLocalNetworkUsageDescription`** is the sentence macOS shows in the permission dialog. Write it for the person deciding whether to grant access. "OpenCode needs network access" answers nothing.
 
-The identifier is yours to choose. Anything reverse-DNS-shaped works; it only has to stay stable, because the grant is remembered against it.
+The identifier is yours to choose. Anything reverse-DNS-shaped works, provided it stays stable: the grant is remembered against it.
 
 ## Step 2: the launch agent
 
@@ -136,9 +136,9 @@ Save this as `~/Library/LaunchAgents/dev.example.opencode.plist`. Change the pat
 </plist>
 ```
 
-`AssociatedBundleIdentifiers` is the line everyone forgets. Without it, `launchd` starts a process that belongs to no bundle, macOS falls through to its deny-by-default rule, and you get the same `EHOSTUNREACH` you had before — with a perfectly good bundle sitting on disk, unused.
+`AssociatedBundleIdentifiers` is the line everyone forgets. Without it, `launchd` starts a process that belongs to no bundle, macOS falls through to its deny-by-default rule, and you get the same `EHOSTUNREACH` as before, with a working bundle sitting on disk unused.
 
-The explicit `PATH` matters too, for a duller reason: launch agents do not inherit your shell environment. Without it, anything the service shells out to — `npx` for an MCP server, `git`, `ssh` — is not found. That failure looks like the MCP server being broken, not like a missing path.
+The explicit `PATH` matters for a duller reason: launch agents do not inherit your shell environment. Without it the service cannot find `npx`, `git` or `ssh`, and the failure looks like a broken MCP server rather than a missing path.
 
 ## Step 3: sign it
 
@@ -147,9 +147,9 @@ codesign --force --deep --sign - "$HOME/Applications/OpenCode LAN.app"
 codesign --verify --deep --strict "$HOME/Applications/OpenCode LAN.app"
 ```
 
-`--sign -` means ad-hoc. Ad-hoc signatures are fine for a bundle that never leaves your machine, and — this is the part that surprises people — **sufficient for Local Network Privacy**. macOS does not require a Developer ID here; it requires an *identity*, and an ad-hoc signature supplies one.
+`--sign -` means ad-hoc. Ad-hoc signatures suit a bundle that never leaves your machine, and they satisfy Local Network Privacy. That last part surprises people. macOS asks for an identity here, not a Developer ID, and an ad-hoc signature supplies one.
 
-The trade-off is durability. The grant is keyed to the signature, and an ad-hoc signature is a hash of the binary. Copy a new binary in, and the hash changes, and the grant no longer matches. More on that in the upgrade section.
+The cost is durability. macOS keys the grant to the signature, and an ad-hoc signature is a hash of the binary. Copy a new binary in and the hash changes, so the grant stops matching. The upgrade section handles this.
 
 ## Step 4: the cutover, from a real terminal
 
@@ -177,7 +177,7 @@ The first LAN connection from the wrapped service triggers the dialog:
 
 > **OpenCode** wants to access devices on your local network.
 
-Click **Allow**. Then verify — because "it seemed to work" is not verification:
+Click **Allow**, then verify. "It seemed to work" is not verification:
 
 ```bash
 opencode service status
@@ -191,11 +191,11 @@ AI_APICallError: Cannot connect to API: Was there a typo in the url or port?
   code: "FailedToOpenSocket"
 ```
 
-If the prompt never appears, check three things in order: the launch agent actually has `AssociatedBundleIdentifiers`, its value matches `CFBundleIdentifier` character for character, and the binary inside the bundle is a real file rather than a symlink.
+If the prompt never appears, check three things in order: the launch agent has `AssociatedBundleIdentifiers`, its value matches `CFBundleIdentifier` character for character, and the binary inside the bundle is a real file rather than a symlink.
 
-## Verifying the mechanism, not just the outcome
+## Proving it is the mechanism
 
-The reason I trust this fix is not that it worked. It is that the failure and the success differ in exactly one variable.
+I trust this fix because the failure and the success differ in one variable, and I changed it on purpose.
 
 Before the wrapper, same binary, same config, same network:
 
@@ -210,7 +210,7 @@ After loading the agent and clicking Allow:
 OK   connected
 ```
 
-The two failures are the pre-prompt attempts. Nothing else changed — not the config, not the server, not the network. That is what a permissions problem looks like when you finally see it, and it is why I stopped believing the earlier theories about DNS, undici and Bun.
+The two failures are the pre-prompt attempts. Nothing else changed: same config, same server, same network. That is what a permissions problem looks like once you see it, and why I dropped the earlier theories about DNS, undici and Bun.
 
 ## The upgrade problem
 
@@ -237,7 +237,7 @@ codesign --verify --deep --strict "$APP"
 launchctl kickstart -k "gui/$(id -u)/$LABEL"
 ```
 
-Then expect to click **Allow** again on the next LAN connection. That is not a bug in the wrapper — it is the ad-hoc signature changing, which invalidates the grant. It is also the reason the proper fix has to come from upstream: only a stable Developer ID signature gives you an identity that survives updates.
+Then expect to click **Allow** again on the next LAN connection. The ad-hoc signature changed, which invalidates the grant. That is also why the real fix belongs upstream: a stable Developer ID signature gives you an identity that survives updates.
 
 Keep a rollback script too, because you will want it at 23:00 on a Sunday:
 
@@ -266,10 +266,10 @@ Even with the wrapper working, the shipped binary still has no bundle. Three cha
 2. Run the background service from inside it.
 3. Put `AssociatedBundleIdentifiers` on the service registration.
 
-I filed that as [anomalyco/opencode#58080](https://github.com/anomalyco/opencode/issues/58080) with the evidence and the recipes above. Three earlier reports — [#25908](https://github.com/anomalyco/opencode/issues/25908), [#38854](https://github.com/anomalyco/opencode/issues/38854), [#37432](https://github.com/anomalyco/opencode/issues/37432) — were closed without a fix, and the failure survives into 2.x.
+I filed that as [anomalyco/opencode#58080](https://github.com/anomalyco/opencode/issues/58080) with the evidence and the recipes above. Three earlier reports ([#25908](https://github.com/anomalyco/opencode/issues/25908), [#38854](https://github.com/anomalyco/opencode/issues/38854), [#37432](https://github.com/anomalyco/opencode/issues/37432)) were closed without a fix, and the failure survives into 2.x.
 
-Until then: eight files, one signature, and a script to re-run after every upgrade.
+Until then, it takes eight files, one signature and a script to re-run after every upgrade.
 
 ## Related posts
 
-- [macOS Local Network Privacy: why your CLI gets EHOSTUNREACH](/blog/macos/local-network-privacy/) — the diagnosis: what LNP actually gates, and why `launchd` is the gap.
+- [macOS Local Network Privacy: why your CLI gets EHOSTUNREACH](/blog/macos/local-network-privacy/): the diagnosis, what LNP gates, and why `launchd` is the gap.
