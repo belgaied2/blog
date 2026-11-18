@@ -398,3 +398,20 @@ blockquote {
     background-color: #038252;
     border-color: #038252;
 }
+
+/* Long lines in XML, plist and shell examples wrap rather than scroll out of
+   view; code that genuinely needs columns still wraps at a sensible width. */
+.article-post pre > code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* Inline code: the theme borrows Bootstrap's magenta, which pulls the eye off
+   the sentence. Neutral text on a faint background reads better and matches
+   the palette. */
+.article-post :not(pre) > code {
+    color: #212529;
+    background-color: rgba(0, 0, 0, .055);
+    padding: .1em .32em;
+    border-radius: 3px;
+}
