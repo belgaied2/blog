@@ -20,7 +20,11 @@ keywords:
 
 [Last time](/blog/macos/local-network-privacy/) I explained *why* a background service on macOS 15+ cannot reach your LAN: Local Network Privacy gates sockets by program identity, and a bare CLI started by `launchd` has no identity to gate. This post is the other half: the wrapper itself, the files, the cutover, and the parts that need redoing after every upgrade.
 
-Eight files, one `codesign` command, one `launchctl` bootstrap, and a note in your calendar for update day.
+This is what you will need:
+- Eight files,
+- one `codesign` command,
+- one `launchctl` bootstrap,
+- and a note in your calendar for update day.
 
 ## What we are building
 
@@ -40,7 +44,7 @@ Three things make it work, and all three are required:
 2. `NSLocalNetworkUsageDescription`, so the prompt has something to say.
 3. `AssociatedBundleIdentifiers` in the launch agent, so the detached service is attributed to the bundle rather than to nothing.
 
-Miss any one and you are back to a silent `EHOSTUNREACH`.
+Beware that missing any one from the above will probably prevent resolving the `EHOSTUNREACH` error.
 
 ## Step 1: assemble the bundle
 
@@ -83,7 +87,7 @@ Two details worth understanding:
 - **`LSBackgroundOnly`** keeps the app out of the Dock and the app switcher. You are not launching a GUI; you are giving a background service a name badge.
 - **`NSLocalNetworkUsageDescription`** is the sentence macOS shows in the permission dialog. Write it for the person deciding whether to grant access. "OpenCode needs network access" answers nothing.
 
-The identifier is yours to choose. Anything reverse-DNS-shaped works, provided it stays stable: the grant is remembered against it.
+You can choose whatever identifier you want. Anything reverse-DNS-shaped works, provided it stays stable: macOS will remember that it granted access based on that identifier.
 
 ## Step 2: the launch agent
 
@@ -138,7 +142,7 @@ Save this as `~/Library/LaunchAgents/dev.example.opencode.plist`. Change the pat
 
 `AssociatedBundleIdentifiers` is the line everyone forgets. Without it, `launchd` starts a process that belongs to no bundle, macOS falls through to its deny-by-default rule, and you get the same `EHOSTUNREACH` as before, with a working bundle sitting on disk unused.
 
-The explicit `PATH` matters for a duller reason: launch agents do not inherit your shell environment. Without it the service cannot find `npx`, `git` or `ssh`, and the failure looks like a broken MCP server rather than a missing path.
+The explicit `PATH` matters for another reason: launch agents **do not inherit your shell environment**. Without it the service cannot find `npx`, `git` or `ssh`, and the failure looks like a broken MCP server rather than a missing path.
 
 ## Step 3: sign it
 
