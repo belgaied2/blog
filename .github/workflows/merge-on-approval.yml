@@ -1,8 +1,14 @@
 name: merge on approval
 
 # The PR author is the bot account, so the repository owner can approve it.
-# Merging with the bot token (not GITHUB_TOKEN) matters: pushes made with the
-# default token do not trigger the deploy workflow.
+#
+# Branch protection requires the head branch to be up to date (strict), so a PR
+# that falls behind master cannot merge even when approved. This job rebases
+# such a branch, then enables auto-merge so the merge still happens without a
+# second workflow run once checks pass and the approval is valid.
+#
+# Merging with the bot token matters: pushes made with GITHUB_TOKEN do not
+# trigger the deploy workflow.
 
 on:
   pull_request_review:
@@ -10,6 +16,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   merge:
@@ -19,9 +26,42 @@ jobs:
       github.event.pull_request.base.ref == 'master'
     runs-on: ubuntu-latest
     steps:
-      - name: Merge the pull request
+      - name: Merge, rebasing first if the branch is behind
         env:
           GH_TOKEN: ${{ secrets.BOT_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
-        run: gh pr merge "$PR" --repo "$REPO" --squash --delete-branch
+        run: |
+          set -euo pipefail
+
+          state=$(gh pr view "$PR" --repo "$REPO" --json mergeStateStatus --jq '.mergeStateStatus')
+          echo "mergeStateStatus=$state"
+
+          case "$state" in
+            BEHIND)
+              echo "branch is behind master: rebasing"
+              gh api -X PUT "repos/$REPO/pulls/$PR/update-branch" -f update_method=rebase > /dev/null
+              gh pr comment "$PR" --repo "$REPO" --body "The branch was behind \`master\`, so I rebased it. If that push dismissed the approval, approve again: auto-merge is enabled and will complete on its own once \`build\` passes."
+              gh pr merge "$PR" --repo "$REPO" --squash --auto --delete-branch
+              ;;
+
+            CLEAN|HAS_HOOKS|UNSTABLE)
+              gh pr merge "$PR" --repo "$REPO" --squash --auto --delete-branch
+              ;;
+
+            DIRTY)
+              gh pr comment "$PR" --repo "$REPO" --body "Cannot merge: the branch conflicts with \`master\`. Resolve the conflict and push; the approval can then be renewed."
+              exit 1
+              ;;
+
+            BLOCKED)
+              gh pr comment "$PR" --repo "$REPO" --body "Cannot merge: \`mergeStateStatus=BLOCKED\`. Check the required reviews and the \`build\` check on this pull request."
+              exit 1
+              ;;
+
+            *)
+              echo "unexpected mergeStateStatus: $state"
+              gh pr comment "$PR" --repo "$REPO" --body "Cannot merge: unexpected state \`$state\`. Merging by hand is safe here."
+              exit 1
+              ;;
+          esac
