@@ -1,4 +1,6 @@
 {{- $src := .Destination -}}
+{{- $path := $src -}}
+{{- if hasPrefix $src "/" }}{{ $path = strings.TrimPrefix "/" $src | relURL }}{{ end -}}
 {{- $width := "" -}}
 {{- $height := "" -}}
 {{- if hasPrefix $src "/" -}}
@@ -7,4 +9,8 @@
     {{- $height = .Height -}}
   {{- end -}}
 {{- end -}}
-<img src="{{ $src | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ with $width }} width="{{ . }}"{{ end }}{{ with $height }} height="{{ . }}"{{ end }} loading="lazy" decoding="async">
+{{/* Screenshots are wider than the column, so wrap each image in a link to the
+     full-size file. The attributes keep the aspect ratio known before load. */}}
+<a class="article-image" href="{{ $path | safeURL }}" target="_blank" rel="noopener" title="Open full size">
+  <img src="{{ $path | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ with $width }} width="{{ . }}"{{ end }}{{ with $height }} height="{{ . }}"{{ end }} loading="lazy" decoding="async">
+</a>
