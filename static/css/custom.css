@@ -422,3 +422,9 @@ blockquote {
 .article-post img {
     height: auto;
 }
+
+/* Bare URLs in body text (a list of links) otherwise push the page wider than
+   the viewport on phones. */
+.article-post {
+    overflow-wrap: break-word;
+}
