@@ -415,3 +415,10 @@ blockquote {
     padding: .1em .32em;
     border-radius: 3px;
 }
+
+/* The render hook emits width and height attributes so the browser reserves
+   space, but the theme only sets max-width: 100%. Without height:auto the
+   height attribute wins and images squash as the column shrinks. */
+.article-post img {
+    height: auto;
+}
