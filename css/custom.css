@@ -415,3 +415,100 @@ blockquote {
     padding: .1em .32em;
     border-radius: 3px;
 }
+
+/* The render hook emits width and height attributes so the browser reserves
+   space, but the theme only sets max-width: 100%. Without height:auto the
+   height attribute wins and images squash as the column shrinks. */
+.article-post img {
+    height: auto;
+}
+
+/* Bare URLs in body text (a list of links) otherwise push the page wider than
+   the viewport on phones. */
+.article-post {
+    overflow-wrap: break-word;
+}
+
+/* Images link to the full-size file; make that discoverable without a caption. */
+.article-post a.article-image {
+    display: block;
+    cursor: zoom-in;
+    border: 0;
+}
+
+.article-post a.article-image img {
+    display: block;
+}
+
+/* Lightbox: images expand over the page rather than opening a new tab. */
+html.lightbox-open,
+html.lightbox-open body {
+    overflow: hidden;
+}
+
+.lightbox[hidden] {
+    display: none;
+}
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3.5rem 1rem 1rem;
+    background: rgba(12, 12, 12, .975);
+}
+
+.lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border: 0;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, .5);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: .75rem;
+    right: .9rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .12);
+    color: #fff;
+    font-size: 1.9rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.lightbox-close:hover,
+.lightbox-close:focus {
+    background: rgba(255, 255, 255, .24);
+}
+
+.lightbox-original {
+    position: absolute;
+    top: 1.15rem;
+    left: 1rem;
+    color: rgba(255, 255, 255, .75);
+    font-size: .85rem;
+    text-decoration: none;
+}
+
+.lightbox-original:hover,
+.lightbox-original:focus {
+    color: #fff;
+    text-decoration: underline;
+}
+
+@media (max-width: 575px) {
+    .lightbox {
+        padding: 3rem .5rem .5rem;
+    }
+}
