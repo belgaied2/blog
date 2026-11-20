@@ -428,3 +428,14 @@ blockquote {
 .article-post {
     overflow-wrap: break-word;
 }
+
+/* Images link to the full-size file; make that discoverable without a caption. */
+.article-post a.article-image {
+    display: block;
+    cursor: zoom-in;
+    border: 0;
+}
+
+.article-post a.article-image img {
+    display: block;
+}
