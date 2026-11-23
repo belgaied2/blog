@@ -36,7 +36,7 @@ The demo cluster was k3s with Cilium on a mini-PC control plane, with two cards 
 | RX 6900 XT (2020, RDNA2) | 16 GB | llama.cpp on Vulkan. No HAMi, no Kaito, no vLLM |
 | RTX 3090 (rented on vast.ai) | 24 GB | vLLM through Kaito, behind llm-d |
 
-The 3090 is the interesting one: **$0.35–0.46 an hour on vast.ai**, joined to the LAN over a WireGuard split tunnel, roughly 130 ms from the control plane. That is not a detail, it is the whole argument for "ephemeral inference" — and later in this post it is also the reason a demo broke.
+The 3090 is the interesting one: **$0.35–0.46 an hour on vast.ai**, joined to the LAN over a WireGuard split tunnel, roughly 130 ms from the control plane. That is the whole argument for "ephemeral inference". Later in this post, it is also the reason a demo broke.
 
 ## What it is actually for
 
@@ -77,7 +77,7 @@ $ # loading a second model in the same pod:
 
 Refused at the slice boundary while the card still had ~7 GB free. That is the feature working, but it surprises people who expect the scheduler to be clever.
 
-Two limits matter. It is **memory isolation, not performance isolation**: a busy pod slows its neighbours. And **anything on the GPU outside Kubernetes is invisible to HAMi** — Open WebUI, running in Docker on the same machine, quietly held 242 MiB for its built-in embeddings until I pointed it at the cluster's service.
+Two limits matter. It is **memory isolation, not performance isolation**: a busy pod slows its neighbours. And **anything on the GPU outside Kubernetes is invisible to HAMi**: Open WebUI, running in Docker on the same machine, quietly held 242 MiB for its built-in embeddings until I pointed it at the cluster's service.
 
 ## The RX 6900 XT: the fastest card that supports nothing
 
@@ -136,7 +136,7 @@ llm-d puts a router in front of an `InferencePool`. The EPP scores replicas by q
 
 It works: **22 tokens in 0.40 s end to end** through the Istio gateway and the router, against 29 tokens in 0.52 s directly to the pod. The router adds no visible latency.
 
-And the honest part: **with one replica, there is nothing to choose between.** llm-d is plumbing until you run two or more replicas of the same model, which at home needs two GPUs, or one GPU sliced by HAMi — the experiment I ran out of time for.
+And the honest part: **with one replica, there is nothing to choose between.** llm-d is plumbing until you run two or more replicas of the same model, which at home needs two GPUs, or one GPU sliced by HAMi, which is the experiment I ran out of time for.
 
 Two practical notes. Kaito only creates the InferencePool and router for an `InferenceSet`; a plain `Workspace` gets none. And neither Cilium's gateway nor Traefik implements the Gateway API Inference Extension, so Istio runs gateway-only next to Cilium, no sidecars.
 
@@ -152,7 +152,7 @@ Kubernetes is not slow. Pulling five gigabytes of weights is.
 | Gemma 4 E4B with a Hugging Face token, warm cache | 94 s |
 | llama.cpp Vulkan, model cached | 36 s |
 
-And then the rented-GPU lesson: **destroying the vast.ai instance deletes the image and the weights with it.** The next node starts the 22 + 28 minutes again. Ephemeral inference only works if images and models are cached somewhere that outlives the GPU — a registry mirror and a model store on real disks. I learned that the expensive way, twice.
+And then the rented-GPU lesson: **destroying the vast.ai instance deletes the image and the weights with it.** The next node starts the 22 + 28 minutes again. Ephemeral inference only works if images and models are cached somewhere that outlives the GPU: a registry mirror and a model store on real disks. I learned that the expensive way, twice.
 
 ## vLLM or Ollama?
 
@@ -166,7 +166,7 @@ vLLM's advantage appears when requests arrive together: **223,622 tokens per min
 |---|---|
 | One GPU, one user | **Ollama or LM Studio.** Don't overthink it |
 | Several AI services on one card | **HAMi.** Worth installing tonight |
-| GPUs that join and leave (gaming PC, rented card) | Kubernetes — after you cache images and weights |
+| GPUs that join and leave (gaming PC, rented card) | Kubernetes, after you cache images and weights |
 | Two or more replicas of the same model | **Kaito + llm-d.** Where the enterprise stack earns its keep |
 
 My first reason is **learning**, the second is **privacy**. You will not save money and you will not run the best models. The moving parts tell the story: Ollama is one process; this stack is GPU Operator, HAMi, Kaito, Flux, Istio, llm-d and Prometheus, and each one can break the others.
@@ -175,7 +175,7 @@ The professional argument is real, though. vLLM, the Gateway API Inference Exten
 
 ## What this teaches you about production inference
 
-The stack in this post is not a homelab toy version of something else. It is the same shape as what teams run in production: a GPU operator for device management, HAMi or MIG for sharing, vLLM for serving, the Gateway API Inference Extension for routing, and an autoscaler or model operator above it.
+The stack in this post has the same shape as what teams run in production: a GPU operator for device management, HAMi or MIG for sharing, vLLM for serving, the Gateway API Inference Extension for routing, and an autoscaler or model operator above it.
 
 What changes at work is scale and consequence, not vocabulary. A replica that takes 28 minutes to become Ready is a demo problem at home and an incident in production. A device plugin that fights another one is a puzzling evening here and a failed rollout there.
 
