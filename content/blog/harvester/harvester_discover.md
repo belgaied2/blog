@@ -24,7 +24,7 @@ This article started as an install walkthrough in 2021, when Harvester was at v0
 
 ## What Harvester actually is
 
-Harvester is not a hypervisor written from scratch. It is an opinionated bundle of existing projects, assembled into an appliance you install from an ISO. Under the hood:
+Harvester bundles existing projects into an appliance you install from an ISO; nothing in it is a hypervisor written from scratch. Under the hood:
 
 - **KubeVirt** runs the virtual machines as Kubernetes workloads, so a VM is a custom resource, not a process on a hypervisor.
 - **Longhorn** provides replicated block storage across the nodes. This is where VM disks live.

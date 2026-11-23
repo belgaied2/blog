@@ -1,0 +1,9 @@
+{{- $dest := .Destination -}}
+{{- $internal := hasPrefix $dest "/" -}}
+{{- if $internal -}}
+  {{- $dest = strings.TrimPrefix "/" $dest | relURL -}}
+{{- end -}}
+{{/* Absolute internal links are rewritten through relURL so a preview under
+     /preview/<n>/ keeps its links inside the preview. External URLs, anchors
+     and relative paths pass through unchanged. */}}
+<a href="{{ $dest | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}>{{ .Text | safeHTML }}</a>
