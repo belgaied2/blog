@@ -89,7 +89,23 @@
 		function gtag(){dataLayer.push(arguments);}
 		gtag('js', new Date());
 
-		gtag('config', 'G-NEZQ0R96ZR');
+		// Tag this browser as internal traffic when the page is opened with
+		// ?internal=1, and remember the choice. A GA4 data filter then excludes
+		// traffic_type=internal from reports.
+		(function () {
+			var internal = false;
+			try {
+				if (new URLSearchParams(location.search).has('internal')) {
+					localStorage.setItem('ga_internal', '1');
+				}
+				internal = localStorage.getItem('ga_internal') === '1';
+			} catch (e) {
+				internal = false;
+			}
+			gtag('config', 'G-NEZQ0R96ZR', {
+				traffic_type: internal ? 'internal' : 'external'
+			});
+		})();
 	</script>
 	<!-- Custom css -->
 	{{ range .Site.Params.customCSS -}}
