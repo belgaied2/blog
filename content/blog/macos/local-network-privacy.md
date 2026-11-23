@@ -37,7 +37,7 @@ connect EHOSTUNREACH 192.168.1.50:11434
 
 The URL is right, the port is open, and the server is up. The error is misleading, because the connection never leaves your machine.
 
-This is macOS Local Network Privacy, and it is not a bug in your tool. It is a permission decision that macOS makes about *which program* is opening the socket, and it fails silently.
+This is macOS Local Network Privacy: a permission decision about *which program* is opening the socket, applied silently, before any packet leaves the machine. Your tool is working as designed.
 
 ## The symptom that gives it away
 
@@ -185,4 +185,4 @@ I filed the upstream report for OpenCode with the full evidence: [anomalyco/open
 
 ## Related posts
 
-- [Wrapping OpenCode in a .app to fix macOS LAN access](/blog/macos/opencode-wrapper/) — the full recipe, with the cutover and the upgrade script.
+- [Wrapping OpenCode in a .app to fix macOS LAN access](/blog/macos/opencode-wrapper/): the full recipe, with the cutover and the upgrade script.
